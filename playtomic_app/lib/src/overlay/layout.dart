@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:playtomic_app/src/pages/Home.dart';
 import 'package:playtomic_app/src/pages/discover.dart';
 import 'package:playtomic_app/src/pages/community.dart';
 import 'package:playtomic_app/src/pages/Profile.dart';
 
 import '../settings/settings_view.dart';
-
-// test
 
 /// Displays a list of SampleItems.
 class Layout extends StatelessWidget {
@@ -19,32 +19,67 @@ class Layout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 4,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('playtomic'),
-            actions: [IconButton(onPressed: () {
-              Navigator.restorablePushNamed(context, SettingsView.routeName);
-            }, icon: const Icon(Icons.settings))],
-            bottom: const TabBar(
-              
-              tabs: [
-                Tab(icon: Icon(Icons.directions_car)),
-                Tab(icon: Icon(Icons.directions_transit)),
-                Tab(icon: Icon(Icons.directions_bike)),
-                Tab(icon: Icon(Icons.access_time_sharp))
-              ],
-            )
-          ),
-          body: const TabBarView(
-            children: [
-              Home(),
-              Discover(),
-              Community(),
-              Profile()
-            ],
-          ),
+      length: 4,
+      child: Scaffold(
+        appBar: AppBar(
+            toolbarHeight: 80,
+            title: const Row(mainAxisSize: MainAxisSize.min, children: [
+              ImageIcon(
+                AssetImage("assets/images/PT_logo.png"),
+                size: 40,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'P L A Y T O M I C',
+                style: TextStyle(fontFamily: 'Naville'),
+              ),
+            ]),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.restorablePushNamed(
+                        context, SettingsView.routeName);
+                  },
+                  icon: const Icon(Icons.chat)),
+              IconButton(
+                  onPressed: () {
+                    Navigator.restorablePushNamed(
+                        context, SettingsView.routeName);
+                  },
+                  icon: const Icon(Icons.notifications))
+            ]),
+        bottomNavigationBar: const TabBar(tabs: [
+          Tab(
+              text: "Play",
+              icon: ImageIcon(
+                AssetImage("images/tennisball.png"),
+                size: 40,
+              )),
+          Tab(
+              text: "Discover",
+              icon: ImageIcon(
+                AssetImage("images/radar.png"),
+                size: 40,
+              )),
+          Tab(
+              text: "Community",
+              icon: ImageIcon(
+                AssetImage("images/home.png"),
+                size: 40,
+              )),
+          Tab(
+              text: "Profile",
+              icon: ImageIcon(
+                AssetImage("images/profile.png"),
+                size: 40,
+              ))
+        ]),
+        body: const TabBarView(
+          children: [Home(), Discover(), Community(), Profile()],
         ),
-      );
-        }
+      ),
+    );
+  }
 }
