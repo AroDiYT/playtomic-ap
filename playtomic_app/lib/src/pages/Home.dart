@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 
-
-/// Displays a list of SampleItems.
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({
-    super.key,
-  });
-
-  static const routeName = '/';
+class Home extends StatefulWidget {
+  const Home({ super.key });
 
   @override
+  // ignore: library_private_types_in_public_api
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-            appBar: AppBar(title: const Text("Demo Playtomic")),
-            body: const Center(child: Text("Hello!")),
-          );
-        }
+    return const Text(
+      "Home Page"
+    );
+  }
 }
