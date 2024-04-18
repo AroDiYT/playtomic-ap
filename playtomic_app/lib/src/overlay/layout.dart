@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:playtomic_app/src/pages/Home.dart';
+import 'package:playtomic_app/src/pages/home.dart';
 import 'package:playtomic_app/src/pages/discover.dart';
 import 'package:playtomic_app/src/pages/community.dart';
 import 'package:playtomic_app/src/pages/Profile.dart';

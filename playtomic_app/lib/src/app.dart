@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:playtomic_app/src/overlay/layout.dart';
+import 'package:playtomic_app/src/pages/login.dart';
 
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -15,8 +16,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Glue the SettingsController to the MaterialApp.
-    //
     // The ListenableBuilder Widget listens to the SettingsController for changes.
     // Whenever the user updates their settings, the MaterialApp is rebuilt.
     return ListenableBuilder(
@@ -47,7 +46,7 @@ class MyApp extends StatelessWidget {
                     return SettingsView(controller: settingsController);
                   case Layout.routeName:
                   default:
-                    return const Layout();
+                    return const LoginPage();
                 }
               },
             );
