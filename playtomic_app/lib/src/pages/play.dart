@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playtomic_app/src/settings/settings_view.dart';
 
 class Play extends StatefulWidget {
   const Play({super.key});
@@ -11,6 +12,40 @@ class Play extends StatefulWidget {
 class _PlayState extends State<Play> {
   @override
   Widget build(BuildContext context) {
-    return Text("Play Page");
+    return Scaffold(
+      appBar: AppBar(
+          toolbarHeight: 80,
+          title: const Row(mainAxisSize: MainAxisSize.min, children: [
+            Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: ImageIcon(
+                AssetImage("assets/images/PT_logo.png"),
+                size: 30,
+              ),
+            ),
+            Text(
+              'PLAYTOMIC',
+              style: TextStyle(
+                  fontFamily: 'Naville',
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.bold),
+            ),
+          ]),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.restorablePushNamed(
+                      context, SettingsView.routeName);
+                },
+                icon: const Icon(Icons.chat_bubble_outline)),
+            IconButton(
+                onPressed: () {
+                  Navigator.restorablePushNamed(
+                      context, SettingsView.routeName);
+                },
+                icon: const Icon(Icons.notifications_none_outlined))
+          ]),
+      body: Text("Play Page"),
+    );
   }
 }

@@ -31,35 +31,6 @@ class _LayoutState extends State<Layout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          toolbarHeight: 80,
-          title: const Row(mainAxisSize: MainAxisSize.min, children: [
-            ImageIcon(
-              AssetImage("assets/images/PT_logo.png"),
-              size: 40,
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            Text(
-              'P L A Y T O M I C',
-              style: TextStyle(fontFamily: 'Naville'),
-            ),
-          ]),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.restorablePushNamed(
-                      context, SettingsView.routeName);
-                },
-                icon: const Icon(Icons.chat)),
-            IconButton(
-                onPressed: () {
-                  Navigator.restorablePushNamed(
-                      context, SettingsView.routeName);
-                },
-                icon: const Icon(Icons.notifications))
-          ]),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(boxShadow: <BoxShadow>[
           BoxShadow(
