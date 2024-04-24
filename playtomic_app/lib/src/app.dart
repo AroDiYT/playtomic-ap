@@ -16,16 +16,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (ctx, snapshot) {
-              if (snapshot.hasData) {
-                return const Layout();
-              } else {
-                return const LoginPage();
-              }
-            }));
+    return MaterialApp(
+      home: StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (ctx, snapshot) {
+            if (snapshot.hasData) {
+              return const Layout();
+            } else {
+              return const LoginPage();
+            }
+          }),
+    );
   }
 
 /*
