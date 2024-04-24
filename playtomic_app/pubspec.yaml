@@ -17,6 +17,8 @@ dependencies:
     sdk: flutter
 
   firebase_auth: 4.19.2
+  google_fonts: ^6.2.1
+  getwidget: ^4.0.0
 
 dev_dependencies:
   flutter_test:
