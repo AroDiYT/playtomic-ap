@@ -4,8 +4,6 @@ import 'package:playtomic_app/src/pages/discover.dart';
 import 'package:playtomic_app/src/pages/community.dart';
 import 'package:playtomic_app/src/pages/Profile.dart';
 
-import '../settings/settings_view.dart';
-
 /// Displays a list of SampleItems.
 class Layout extends StatefulWidget {
   const Layout({

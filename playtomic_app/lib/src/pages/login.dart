@@ -29,6 +29,7 @@ class _LoginState extends State<LoginPage> {
           password: _pwController.text.trim());
       setState(() {
         errorMessage = '';
+        Navigator.pop(context);
       });
     } on FirebaseAuthException catch (e) {
       // https://firebase.google.com/docs/auth/admin/errors

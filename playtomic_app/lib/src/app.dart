@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:playtomic_app/src/overlay/layout.dart';
+import 'package:playtomic_app/src/pages/auth_page.dart';
 import 'package:playtomic_app/src/pages/login.dart';
 import 'settings/settings_controller.dart';
 //import 'settings/settings_view.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData) {
               return const Layout();
             } else {
-              return const LoginPage();
+              return const AuthPage();
             }
           }),
     );
