@@ -15,6 +15,13 @@ class _LoginState extends State<LoginPage> {
 
   String errorMessage = '';
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _pwController.dispose();
+    super.dispose();
+  }
+
   Future signIn() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
