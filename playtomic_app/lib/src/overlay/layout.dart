@@ -1,10 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:playtomic_app/src/pages/home.dart';
 import 'package:playtomic_app/src/pages/discover.dart';
 import 'package:playtomic_app/src/pages/community.dart';
 import 'package:playtomic_app/src/pages/Profile.dart';
+import 'package:playtomic_app/src/pages/login.dart';
 
 import '../settings/settings_view.dart';
 
@@ -18,6 +18,86 @@ class Layout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (ctx, snapshot) {
+          if (snapshot.hasData) {
+            return DefaultTabController(
+              length: 4,
+              child: Scaffold(
+                appBar: AppBar(
+                    toolbarHeight: 80,
+                    title: const Row(mainAxisSize: MainAxisSize.min, children: [
+                      ImageIcon(
+                        AssetImage("assets/images/PT_logo.png"),
+                        size: 40,
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Text(
+                        'P L A Y T O M I C',
+                        style: TextStyle(fontFamily: 'Naville'),
+                      ),
+                    ]),
+                    actions: [
+                      IconButton(
+                          onPressed: () {
+                            Navigator.restorablePushNamed(
+                                context, SettingsView.routeName);
+                          },
+                          icon: const Icon(Icons.chat)),
+                      IconButton(
+                          onPressed: () {
+                            Navigator.restorablePushNamed(
+                                context, SettingsView.routeName);
+                          },
+                          icon: const Icon(Icons.notifications))
+                    ]),
+                bottomNavigationBar: const TabBar(tabs: [
+                  Tab(
+                      text: "Play",
+                      icon: ImageIcon(
+                        AssetImage("images/tennisball.png"),
+                        size: 40,
+                      )),
+                  Tab(
+                      text: "Discover",
+                      icon: ImageIcon(
+                        AssetImage("images/radar.png"),
+                        size: 40,
+                      )),
+                  Tab(
+                      text: "Community",
+                      icon: ImageIcon(
+                        AssetImage("images/home.png"),
+                        size: 40,
+                      )),
+                  Tab(
+                      text: "Profile",
+                      icon: ImageIcon(
+                        AssetImage("images/profile.png"),
+                        size: 40,
+                      ))
+                ]),
+                body: const TabBarView(
+                  children: [Home(), Discover(), Community(), Profile()],
+                ),
+              ),
+            );
+          } else {
+            return LoginPage();
+          }
+        },
+      ),
+    );
+  }
+}
+
+
+
+/*
     return DefaultTabController(
       length: 4,
       child: Scaffold(
@@ -83,3 +163,4 @@ class Layout extends StatelessWidget {
     );
   }
 }
+*/

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:playtomic_app/src/overlay/layout.dart';
-import 'package:playtomic_app/src/pages/login.dart';
-
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
@@ -46,7 +44,7 @@ class MyApp extends StatelessWidget {
                     return SettingsView(controller: settingsController);
                   case Layout.routeName:
                   default:
-                    return const LoginPage();
+                    return const Layout();
                 }
               },
             );
