@@ -13,10 +13,35 @@ class _LoginState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _pwController = TextEditingController();
 
+  String errorMessage = '';
+
   Future signIn() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _pwController.text.trim());
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _pwController.text.trim());
+      setState(() {
+        errorMessage = '';
+      });
+    } on FirebaseAuthException catch (e) {
+      // https://firebase.google.com/docs/auth/admin/errors
+      switch (e.code) {
+        case 'invalid-email':
+          setState(() {
+            errorMessage = "Wrong email!";
+          });
+
+        case 'invalid-credential':
+          setState(() {
+            errorMessage = "Wrong password!";
+          });
+
+        default:
+          setState(() {
+            errorMessage = e.code;
+          });
+      }
+    }
   }
 
   @override
@@ -107,6 +132,10 @@ class _LoginState extends State<LoginPage> {
                       ),
                     )),
               ),
+            ),
+            Text(
+              errorMessage,
+              style: const TextStyle(color: Colors.red),
             )
           ]),
         ),
