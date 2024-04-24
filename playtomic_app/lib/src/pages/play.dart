@@ -11,6 +11,6 @@ class Play extends StatefulWidget {
 class _PlayState extends State<Play> {
   @override
   Widget build(BuildContext context) {
-    return const Text("Play Page");
+    return Text("Play Page");
   }
 }

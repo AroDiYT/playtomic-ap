@@ -7,7 +7,7 @@ import 'package:playtomic_app/src/pages/Profile.dart';
 import '../settings/settings_view.dart';
 
 /// Displays a list of SampleItems.
-class Layout extends StatelessWidget {
+class Layout extends StatefulWidget {
   const Layout({
     super.key,
   });
@@ -15,69 +15,117 @@ class Layout extends StatelessWidget {
   static const routeName = '/';
 
   @override
+  State<Layout> createState() => _LayoutState();
+}
+
+class _LayoutState extends State<Layout> {
+  int index = 0;
+
+  final screens = [
+    const Play(),
+    const Discover(),
+    const Community(),
+    const Profile()
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-            toolbarHeight: 80,
-            title: const Row(mainAxisSize: MainAxisSize.min, children: [
-              ImageIcon(
-                AssetImage("assets/images/PT_logo.png"),
-                size: 40,
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Text(
-                'P L A Y T O M I C',
-                style: TextStyle(fontFamily: 'Naville'),
-              ),
-            ]),
-            actions: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.restorablePushNamed(
-                        context, SettingsView.routeName);
-                  },
-                  icon: const Icon(Icons.chat)),
-              IconButton(
-                  onPressed: () {
-                    Navigator.restorablePushNamed(
-                        context, SettingsView.routeName);
-                  },
-                  icon: const Icon(Icons.notifications))
-            ]),
-        bottomNavigationBar: const TabBar(tabs: [
-          Tab(
-              text: "Play",
+    return Scaffold(
+      appBar: AppBar(
+          toolbarHeight: 80,
+          title: const Row(mainAxisSize: MainAxisSize.min, children: [
+            ImageIcon(
+              AssetImage("assets/images/PT_logo.png"),
+              size: 40,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Text(
+              'P L A Y T O M I C',
+              style: TextStyle(fontFamily: 'Naville'),
+            ),
+          ]),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.restorablePushNamed(
+                      context, SettingsView.routeName);
+                },
+                icon: const Icon(Icons.chat)),
+            IconButton(
+                onPressed: () {
+                  Navigator.restorablePushNamed(
+                      context, SettingsView.routeName);
+                },
+                icon: const Icon(Icons.notifications))
+          ]),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 5,
+          ),
+        ]),
+        child: BottomNavigationBar(
+          fixedColor: Colors.black,
+          backgroundColor: Colors.grey.shade100,
+          currentIndex: index,
+          type: BottomNavigationBarType.fixed,
+          onTap: (index) {
+            setState(() {
+              this.index = index;
+            });
+          },
+          items: const [
+            BottomNavigationBarItem(
               icon: ImageIcon(
                 AssetImage("assets/images/tennisball.png"),
-                size: 40,
-              )),
-          Tab(
-              text: "Discover",
+                size: 30,
+              ),
+              label: "Play",
+              activeIcon: ImageIcon(
+                AssetImage("assets/images/tennisball_selected.png"),
+                size: 30,
+              ),
+            ),
+            BottomNavigationBarItem(
               icon: ImageIcon(
                 AssetImage("assets/images/radar.png"),
-                size: 40,
-              )),
-          Tab(
-              text: "Community",
+                size: 30,
+              ),
+              label: "Discover",
+              activeIcon: ImageIcon(
+                AssetImage("assets/images/radar.png"),
+                size: 30,
+              ),
+            ),
+            BottomNavigationBarItem(
               icon: ImageIcon(
                 AssetImage("assets/images/home.png"),
-                size: 40,
-              )),
-          Tab(
-              text: "Profile",
+                size: 30,
+              ),
+              label: "Community",
+              activeIcon: ImageIcon(
+                AssetImage("assets/images/home_selected.png"),
+                size: 30,
+              ),
+            ),
+            BottomNavigationBarItem(
               icon: ImageIcon(
                 AssetImage("assets/images/profile.png"),
-                size: 40,
-              ))
-        ]),
-        body: const TabBarView(
-          children: [Play(), Discover(), Community(), Profile()],
+                size: 30,
+              ),
+              label: "Profile",
+              activeIcon: ImageIcon(
+                AssetImage("assets/images/profile_selected.png"),
+                size: 30,
+              ),
+            )
+          ],
         ),
       ),
+      body: SafeArea(child: Center(child: screens[index])),
     );
   }
 }
