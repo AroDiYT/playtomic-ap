@@ -52,25 +52,25 @@ class Layout extends StatelessWidget {
           Tab(
               text: "Play",
               icon: ImageIcon(
-                AssetImage("images/tennisball.png"),
+                AssetImage("assets/images/tennisball.png"),
                 size: 40,
               )),
           Tab(
               text: "Discover",
               icon: ImageIcon(
-                AssetImage("images/radar.png"),
+                AssetImage("assets/images/radar.png"),
                 size: 40,
               )),
           Tab(
               text: "Community",
               icon: ImageIcon(
-                AssetImage("images/home.png"),
+                AssetImage("assets/images/home.png"),
                 size: 40,
               )),
           Tab(
               text: "Profile",
               icon: ImageIcon(
-                AssetImage("images/profile.png"),
+                AssetImage("assets/images/profile.png"),
                 size: 40,
               ))
         ]),
