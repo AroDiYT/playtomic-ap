@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:playtomic_app/src/pages/profile_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 
 class Profile extends StatefulWidget {
@@ -42,39 +44,146 @@ class _ProfileState extends State<Profile> {
                     size: 26,
                   ))
             ]),
-        body: Center(
-          child: Column(
-            children: [
-              const Text("Profile Page"),
-              Text("signed in as ${user.email!}"),
-              MaterialButton(
-                  onPressed: () {
-                    FirebaseAuth.instance.signOut();
-                  },
-                  color: Colors.grey,
-                  child: const Text("Sign Out")),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: GFAvatar(
-                      backgroundColor: Colors.blue.shade900,
-                      child: const Text(
-                        "KV",
-                        style: TextStyle(
-                            letterSpacing: 3,
-                            color: Colors.white,
-                            fontSize: 20),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                Text("signed in as ${user.email!}"),
+                MaterialButton(
+                    onPressed: () {
+                      FirebaseAuth.instance.signOut();
+                    },
+                    color: Colors.grey,
+                    child: const Text("Sign Out")),
+                Column(
+                  children: [
+                    // Avatar and name:
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: GFAvatar(
+                            backgroundColor: Colors.indigo.shade900,
+                            child: const Text(
+                              "KV",
+                              style: TextStyle(
+                                  letterSpacing: 3,
+                                  color: Colors.white,
+                                  fontSize: 20),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Koen Van Aken",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              "Voeg mijn locatie toe",
+                              style: TextStyle(
+                                  color: Colors.blue.shade700,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    // Wedstrijden, Volgers and Volgend:
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            TextButton(
+                              onPressed: () {},
+                              child: const Column(
+                                children: [
+                                  Text(
+                                    "0",
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 20),
+                                  ),
+                                  Text(
+                                    "Wedstrijden",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const VerticalDivider(
+                              thickness: 1,
+                              color: Colors.grey,
+                            ),
+                            TextButton(
+                                onPressed: () {},
+                                child: const Column(
+                                  children: [
+                                    Text(
+                                      "0",
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 20),
+                                    ),
+                                    Text("Volgers",
+                                        style: TextStyle(color: Colors.black)),
+                                  ],
+                                )),
+                            const VerticalDivider(
+                              thickness: 1,
+                              color: Colors.grey,
+                            ),
+                            TextButton(
+                                onPressed: () {},
+                                child: const Column(
+                                  children: [
+                                    Text(
+                                      "0",
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 20),
+                                    ),
+                                    Text("Volgend",
+                                        style: TextStyle(color: Colors.black)),
+                                  ],
+                                )),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  const Text(
-                    "Koen Van Aken",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  )
-                ],
-              )
-            ],
+                    // Edit Profile and Get Premium:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Container(
+                          width: 180,
+                          child: GFButton(
+                              onPressed: () {},
+                              color: Colors.indigo.shade900,
+                              shape: GFButtonShape.pills,
+                              type: GFButtonType.outline,
+                              child: const Text("Profiel Bewerken")),
+                        ),
+                        Container(
+                          width: 180,
+                          child: GFButton(
+                              onPressed: () {},
+                              color: Colors.indigo.shade900,
+                              textColor: Colors.amber,
+                              shape: GFButtonShape.pills,
+                              child: const Text("Ga voor Premium")),
+                        )
+                      ],
+                    ),
+                    // Activiteiten and Posts
+                    const ProfileContent()
+                  ],
+                )
+              ],
+            ),
           ),
         ));
   }
