@@ -4,6 +4,8 @@ import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
+// ignore: unused_import
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -64,9 +66,9 @@ class _ProfileState extends State<Profile> {
                           padding: const EdgeInsets.all(15),
                           child: GFAvatar(
                             backgroundColor: Colors.indigo.shade900,
-                            child: const Text(
-                              "KV",
-                              style: TextStyle(
+                            child: Text(
+                              user.displayName?.split("")[0] ?? user.email!.split("")[0],
+                              style: const TextStyle(
                                   letterSpacing: 3,
                                   color: Colors.white,
                                   fontSize: 20),
@@ -76,9 +78,9 @@ class _ProfileState extends State<Profile> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Koen Van Aken",
-                              style: TextStyle(
+                            Text(
+                              user.displayName ?? user.email!,
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Text(
