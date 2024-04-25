@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile_content.dart';
@@ -10,6 +9,7 @@ class Profile extends StatefulWidget {
   const Profile({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ProfileState createState() => _ProfileState();
 }
 
@@ -158,7 +158,7 @@ class _ProfileState extends State<Profile> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Container(
+                        SizedBox(
                           width: 180,
                           child: GFButton(
                               onPressed: () {},
@@ -167,7 +167,7 @@ class _ProfileState extends State<Profile> {
                               type: GFButtonType.outline,
                               child: const Text("Profiel Bewerken")),
                         ),
-                        Container(
+                        SizedBox(
                           width: 180,
                           child: GFButton(
                               onPressed: () {},

@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:playtomic_app/firebase_options.dart';
 
 import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
@@ -15,7 +16,7 @@ void main() async {
   await settingsController.loadSettings();
 
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Run the app and pass in the SettingsController. The app listens to the
   // SettingsController for changes, then passes it further down to the

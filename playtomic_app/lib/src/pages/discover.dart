@@ -5,6 +5,7 @@ class Discover extends StatefulWidget {
   const Discover({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _DiscoverState createState() => _DiscoverState();
 }
 
@@ -31,7 +32,7 @@ class _DiscoverState extends State<Discover> {
                 },
                 icon: const Icon(Icons.chat_bubble_outline)),
           ]),
-      body: Text("Discover Page"),
+      body: const Text("Discover Page"),
     );
   }
 }

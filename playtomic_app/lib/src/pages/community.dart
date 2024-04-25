@@ -41,7 +41,7 @@ class _CommunityState extends State<Community> {
                 },
                 icon: const Icon(Icons.notifications_none_outlined))
           ]),
-      body: Text("Community Page"),
+      body: const Text("Community Page"),
     );
   }
 }
