@@ -45,7 +45,7 @@ class _PlayState extends State<Play> {
                 },
                 icon: const Icon(Icons.notifications_none_outlined))
           ]),
-      body: Text("Play Page"),
+      body: const Text("Play Page"),
     );
   }
 }

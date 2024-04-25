@@ -4,7 +4,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:playtomic_app/src/pages/login.dart';
 
 class AuthPage extends StatelessWidget {
-  const AuthPage({Key? key}) : super(key: key);
+  const AuthPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class AuthPage extends StatelessWidget {
             height: 20,
           ),
           Padding(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             child: Text(
               "Meld je aan voor de grootste \ncommunity van racketsporten",
               style: GoogleFonts.roboto(

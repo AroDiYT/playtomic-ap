@@ -4,6 +4,7 @@ class Notifications extends StatefulWidget {
   const Notifications({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _NotificationsState createState() => _NotificationsState();
 }
 
