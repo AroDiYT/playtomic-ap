@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
@@ -25,6 +27,23 @@ class _RegisterState extends State<Register> {
     _telController.dispose();
     _pwController.dispose();
     super.dispose();
+  }
+
+  Future signUp() async {
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _pwController.text.trim());
+
+    addUserDetails(_nameController.text.trim(), _emailController.text.trim(),
+        _telController.text.trim());
+
+    Navigator.pop(context);
+  }
+
+  Future addUserDetails(String name, String email, String tel) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .add({'name': name, 'email': email, 'tel': tel});
   }
 
   @override
@@ -182,7 +201,7 @@ class _RegisterState extends State<Register> {
               shape: GFButtonShape.pills,
               disabledColor: Colors.grey,
               textStyle: GoogleFonts.roboto(color: Colors.white, fontSize: 18),
-              onPressed: () {},
+              onPressed: signUp,
               fullWidthButton: true,
             ),
           ),
