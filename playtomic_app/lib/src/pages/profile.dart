@@ -5,6 +5,8 @@ import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
+// ignore: unused_import
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -65,6 +67,7 @@ class _ProfileState extends State<Profile> {
                             },
                             color: Colors.grey,
                             child: const Text("Sign Out")),
+
                         Column(
                           children: [
                             // Avatar and name:
@@ -87,6 +90,7 @@ class _ProfileState extends State<Profile> {
                                           color: Colors.white,
                                           fontSize: 20),
                                     ),
+
                                   ),
                                 ),
                                 Column(
