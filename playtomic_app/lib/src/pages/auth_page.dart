@@ -78,8 +78,25 @@ class AuthPage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: GFButton(
               onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (ctx) => const Register()));
+                Navigator.of(context).push(PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (ctx, __, ___) => Register(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 1.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    final tween = Tween(begin: begin, end: end);
+                    final curvedAnimation = CurvedAnimation(
+                      parent: animation,
+                      curve: curve,
+                    );
+
+                    return SlideTransition(
+                        position: tween.animate(curvedAnimation), child: child);
+                  },
+                ));
               },
               text: "Inschrijven",
               shape: GFButtonShape.pills,
@@ -91,8 +108,25 @@ class AuthPage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: GFButton(
               onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (ctx) => const LoginPage()));
+                Navigator.of(context).push(PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (ctx, __, ___) => LoginPage(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 1.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    final tween = Tween(begin: begin, end: end);
+                    final curvedAnimation = CurvedAnimation(
+                      parent: animation,
+                      curve: curve,
+                    );
+
+                    return SlideTransition(
+                        position: tween.animate(curvedAnimation), child: child);
+                  },
+                ));
               },
               text: "Aanmelden",
               shape: GFButtonShape.pills,

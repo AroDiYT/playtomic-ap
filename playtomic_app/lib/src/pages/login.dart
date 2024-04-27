@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/getwidget.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -56,8 +58,105 @@ class _LoginState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: SafeArea(
+        backgroundColor: const Color.fromARGB(230, 0, 0, 0),
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(280, 0, 0, 0),
+          leading: BackButton(
+            color: Colors.white,
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Inloggen",
+                    style:
+                        GoogleFonts.roboto(color: Colors.white, fontSize: 20)),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "E-mail",
+                  style: GoogleFonts.roboto(color: Colors.white, fontSize: 14),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 20,
+                    decoration: const BoxDecoration(
+                        border: Border(
+                            bottom: BorderSide(color: Colors.white, width: 1),
+                            top: BorderSide.none,
+                            right: BorderSide.none,
+                            left: BorderSide.none)),
+                    child: TextField(
+                      controller: _emailController,
+                      style: GoogleFonts.roboto(color: Colors.white),
+                      decoration:
+                          const InputDecoration(border: InputBorder.none),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "Wachtwoord",
+                  style: GoogleFonts.roboto(color: Colors.white, fontSize: 14),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 20,
+                    decoration: const BoxDecoration(
+                        border: Border(
+                            bottom: BorderSide(color: Colors.white, width: 1),
+                            top: BorderSide.none,
+                            right: BorderSide.none,
+                            left: BorderSide.none)),
+                    child: TextField(
+                      controller: _pwController,
+                      obscureText: true,
+                      style: GoogleFonts.roboto(color: Colors.white),
+                      decoration:
+                          const InputDecoration(border: InputBorder.none),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 50,
+                    child: GFButton(
+                        text: "Inloggen",
+                        disabledColor: Colors.grey,
+                        textStyle: GoogleFonts.roboto(
+                            color: Colors.white, fontSize: 18),
+                        fullWidthButton: true,
+                        shape: GFButtonShape.pills,
+                        onPressed: signIn),
+                  ),
+                )
+              ],
+            ),
+          ),
+        )
+        /*
+      SafeArea(
         child: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             // Greeting text
@@ -148,7 +247,7 @@ class _LoginState extends State<LoginPage> {
             )
           ]),
         ),
-      ),
-    );
+      ), */
+        );
   }
 }
