@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:playtomic_app/src/pages/login.dart';
+import 'package:playtomic_app/src/pages/register.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -76,7 +77,10 @@ class AuthPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: GFButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (ctx) => const Register()));
+              },
               text: "Inschrijven",
               shape: GFButtonShape.pills,
               fullWidthButton: true,
