@@ -65,7 +65,7 @@ class _PlayContentState extends State<PlayContent> {
           ),
           // ignore: prefer_const_constructors
           Padding(
-            padding: const EdgeInsets.only(left: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             // ignore: prefer_const_constructors
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,16 +99,52 @@ class _PlayContentState extends State<PlayContent> {
                 const SizedBox(
                   height: 10,
                 ),
-                Container(
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 2, color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white),
-                    child: const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text("Wijzig jouw spelersvoorkeuren"),
-                    )),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                            child: PlayCard(
+                                title: "Een baan zoeken",
+                                icon: Icons.search_outlined,
+                                description: "Als je al weet met wie je speelt",
+                                imagePath: "images/loginimage_9-16.jpg")),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: PlayCard(
+                            title: "Speel een wedstrijd",
+                            icon: Icons.sports_tennis_outlined,
+                            description:
+                                "Als je op zoek bent naar spelers van jouw niveau",
+                            imagePath: "images/loginimage_9-16.jpg",
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                            child: PlayCard(
+                                title: "Lessen", icon: Icons.school_outlined)),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: PlayCard(
+                              title: "Competities",
+                              icon: Icons.shield_outlined),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
                 const SizedBox(
                   height: 30,
                 ),
@@ -152,7 +188,7 @@ class _PlayContentState extends State<PlayContent> {
                       child: Text("Wijzig jouw spelersvoorkeuren"),
                     )),
                 const SizedBox(
-                  height: 50,
+                  height: 200,
                 ),
               ],
             ),
@@ -160,5 +196,77 @@ class _PlayContentState extends State<PlayContent> {
         ],
       ),
     );
+  }
+}
+
+class PlayCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final String? description;
+  final String? imagePath;
+
+  PlayCard(
+      {super.key,
+      required this.title,
+      required this.icon,
+      this.description,
+      this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          border: Border.all(width: 2, color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+        ),
+        child: Stack(
+          children: [
+            if (imagePath != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Image.asset(imagePath!, height: 75, fit: BoxFit.fitWidth),
+                ],
+              ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (imagePath != null)
+                    const SizedBox(
+                      height: 30,
+                    ),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(255, 32, 32, 32)),
+                    width: 50,
+                    height: 50,
+                    child: Icon(icon, size: 30, color: Colors.white),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    title,
+                    style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+                  ),
+                  if (description != null)
+                    const SizedBox(
+                      height: 5,
+                    ),
+                  if (description != null)
+                    Text(
+                      description!,
+                      style: GoogleFonts.roboto(),
+                    )
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 }
