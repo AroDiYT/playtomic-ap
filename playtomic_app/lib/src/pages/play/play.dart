@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playtomic_app/src/pages/play/play_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 
 class Play extends StatefulWidget {
@@ -45,7 +46,7 @@ class _PlayState extends State<Play> {
                 },
                 icon: const Icon(Icons.notifications_none_outlined))
           ]),
-      body: const Text("Play Page"),
+      body: const PlayContent(),
     );
   }
 }
