@@ -7,6 +7,7 @@ import 'package:getwidget/shape/gf_button_shape.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/play/club_card.dart';
 import 'package:playtomic_app/src/pages/play/play_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PlayContent extends StatefulWidget {
   const PlayContent({super.key});
@@ -196,70 +197,87 @@ class _PlayContentState extends State<PlayContent> {
                 ),
                 SizedBox(
                   height: 300,
-                  child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: Container(
-                              width: 200,
-                              height: 300,
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 2, color: Colors.grey.shade300),
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: Colors.white),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                child: Column(
-                                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    const Icon(Icons.location_on_outlined,
-                                        size: 50),
-                                    const SizedBox(
-                                      height: 30,
-                                    ),
-                                    Text(
-                                      "Zoek clubs bij jou in de buurt",
-                                      style: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    const Text("Locatie activeren"),
-                                    const SizedBox(
-                                      height: 50,
-                                    ),
-                                    GFButton(
-                                      onPressed: () {},
-                                      text: "Inschakelen",
-                                      textColor: Colors.white,
-                                      shape: GFButtonShape.pills,
-                                      fullWidthButton: true,
-                                      color: Colors.indigoAccent.shade700,
-                                    )
-                                  ],
-                                ),
-                              )),
-                        ),
-                        const ClubCard(
-                            title: "Urban Padel Brussels",
-                            location: "Anderlecht",
-                            image: NetworkImage(
-                                "https://res.cloudinary.com/playtomic/image/upload/v1668930158/pro/tenants/71aa8a9f-a7cd-47e8-8e0c-8af69ba2c1a7/1668930157916.jpg")),
-                        const ClubCard(
-                            title: "Padel Tennis Club Montjoie",
-                            location: "Uccle",
-                            image: NetworkImage(
-                                "https://res.cloudinary.com/playtomic/image/upload/v1669019496/pro/tenants/9f5eb157-1a8b-4b21-90a8-23811c70fb95/1669019496201.jpg"))
-                      ]),
+                  child: FutureBuilder(
+                      future:
+                          FirebaseFirestore.instance.collection("clubs").get(),
+                      builder: ((context, snapshot) {
+                        List<Widget> children = [];
+
+                        // TODO: check if location is on
+
+                        bool isLocationOn = false;
+                        if (!isLocationOn) {
+                          children.add(Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                                width: 200,
+                                height: 300,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 2, color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: Colors.white),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      const Icon(Icons.location_on_outlined,
+                                          size: 50),
+                                      const SizedBox(
+                                        height: 30,
+                                      ),
+                                      Text(
+                                        "Zoek clubs bij jou in de buurt",
+                                        style: GoogleFonts.roboto(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Text("Locatie activeren"),
+                                      const SizedBox(
+                                        height: 50,
+                                      ),
+                                      GFButton(
+                                        onPressed: () {},
+                                        text: "Inschakelen",
+                                        textColor: Colors.white,
+                                        shape: GFButtonShape.pills,
+                                        fullWidthButton: true,
+                                        color: Colors.indigoAccent.shade700,
+                                      )
+                                    ],
+                                  ),
+                                )),
+                          ));
+                        }
+
+                        if (!snapshot.hasData) {
+                          return const Center(child: Text('Loading..'));
+                        } else {
+                          children = children +
+                              snapshot.data!.docs
+                                  .map((DocumentSnapshot document) {
+                                Map<String, dynamic> clubData =
+                                    document.data()! as Map<String, dynamic>;
+                                return ClubCard(
+                                    title: clubData["name"],
+                                    image: NetworkImage(clubData["image"]),
+                                    location: clubData["location"]["city"]);
+                              }).toList();
+                        }
+
+                        return ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: children);
+                      })),
                 ),
                 const SizedBox(
                   height: 30,
