@@ -33,7 +33,7 @@ class ClubCard extends StatelessWidget {
                 Image(
                   image: image,
                   height: 180,
-                  fit: BoxFit.fitWidth,
+                  fit: BoxFit.cover,
                 ),
               ],
             ),

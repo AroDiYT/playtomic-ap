@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
@@ -253,7 +254,11 @@ class _PlayContentState extends State<PlayContent> {
                             location: "Anderlecht",
                             image: NetworkImage(
                                 "https://res.cloudinary.com/playtomic/image/upload/v1668930158/pro/tenants/71aa8a9f-a7cd-47e8-8e0c-8af69ba2c1a7/1668930157916.jpg")),
-                        //const ClubCard()
+                        const ClubCard(
+                            title: "Padel Tennis Club Montjoie",
+                            location: "Uccle",
+                            image: NetworkImage(
+                                "https://res.cloudinary.com/playtomic/image/upload/v1669019496/pro/tenants/9f5eb157-1a8b-4b21-90a8-23811c70fb95/1669019496201.jpg"))
                       ]),
                 ),
                 const SizedBox(
@@ -267,22 +272,269 @@ class _PlayContentState extends State<PlayContent> {
                 const SizedBox(
                   height: 10,
                 ),
-                Container(
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 2, color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white),
-                    child: const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text("Wijzig jouw spelersvoorkeuren"),
-                    )),
+                SizedBox(
+                    height: 300,
+                    child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                                width: 200,
+                                height: 300,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 2, color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(20),
+                                    image: const DecorationImage(
+                                        image: NetworkImage(
+                                            "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        fit: BoxFit.cover)),
+                                child: Text(
+                                  "Een wedstrijd maken: eenvoudige handleiding",
+                                  style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.white),
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Column(
+                              children: [
+                                Container(
+                                    width: 200,
+                                    height: 145,
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 2,
+                                            color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.grey.shade900
+                                        // image: const DecorationImage(
+                                        //     image: NetworkImage(
+                                        //         "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        //     fit: BoxFit.cover)
+                                        ),
+                                    child: Text(
+                                      "Doe mee aan een wedstrijd met anderen",
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.white),
+                                    )),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                    width: 200,
+                                    height: 145,
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 2,
+                                            color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.grey.shade900
+                                        // image: const DecorationImage(
+                                        //     image: NetworkImage(
+                                        //         "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        //     fit: BoxFit.cover)
+                                        ),
+                                    child: Text(
+                                      "Je partner toevoegen aan een open wedstrijd",
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.white),
+                                    )),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                                width: 200,
+                                height: 300,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 2, color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(20),
+                                    image: const DecorationImage(
+                                        image: NetworkImage(
+                                            "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        fit: BoxFit.cover)),
+                                child: Text(
+                                  "Maak een baanreservering",
+                                  style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.white),
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Column(
+                              children: [
+                                Container(
+                                    width: 200,
+                                    height: 145,
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 2,
+                                            color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.grey.shade900
+                                        // image: const DecorationImage(
+                                        //     image: NetworkImage(
+                                        //         "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        //     fit: BoxFit.cover)
+                                        ),
+                                    child: Text(
+                                      "Gesplitste betaling",
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.white),
+                                    )),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                    width: 200,
+                                    height: 145,
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 2,
+                                            color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.grey.shade900
+                                        // image: const DecorationImage(
+                                        //     image: NetworkImage(
+                                        //         "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        //     fit: BoxFit.cover)
+                                        ),
+                                    child: Text(
+                                      "Premium ervaringen",
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.white),
+                                    )),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                                width: 200,
+                                height: 300,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 2, color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(20),
+                                    image: const DecorationImage(
+                                        image: NetworkImage(
+                                            "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        fit: BoxFit.cover)),
+                                child: Text(
+                                  "Resultaten uploaden",
+                                  style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.white),
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Column(
+                              children: [
+                                Container(
+                                    width: 200,
+                                    height: 145,
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 2,
+                                            color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.grey.shade900
+                                        // image: const DecorationImage(
+                                        //     image: NetworkImage(
+                                        //         "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        //     fit: BoxFit.cover)
+                                        ),
+                                    child: Text(
+                                      "Wedstrijdresultaten bewerken",
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.white),
+                                      overflow: TextOverflow.clip,
+                                    )),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                    width: 200,
+                                    height: 145,
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 2,
+                                            color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.grey.shade900
+                                        // image: const DecorationImage(
+                                        //     image: NetworkImage(
+                                        //         "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        //     fit: BoxFit.cover)
+                                        ),
+                                    child: Text(
+                                      "Niveau's algoritme",
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.white),
+                                    )),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                                width: 200,
+                                height: 300,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 2, color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(20),
+                                    image: const DecorationImage(
+                                        image: NetworkImage(
+                                            "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
+                                        fit: BoxFit.cover)),
+                                child: Text(
+                                  "Verbinden met je vrienden",
+                                  style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.white),
+                                )),
+                          ),
+                        ])),
                 const SizedBox(
                   height: 200,
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

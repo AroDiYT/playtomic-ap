@@ -61,9 +61,12 @@ class PlayCard extends StatelessWidget {
                       height: 5,
                     ),
                   if (description != null)
-                    Text(
-                      description!,
-                      style: GoogleFonts.roboto(),
+                    SizedBox(
+                      height: 40,
+                      child: Text(
+                        description!,
+                        style: GoogleFonts.roboto(),
+                      ),
                     )
                 ],
               ),
