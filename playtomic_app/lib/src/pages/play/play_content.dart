@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:getwidget/components/button/gf_button.dart';
@@ -8,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/play/club_card.dart';
 import 'package:playtomic_app/src/pages/play/play_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PlayContent extends StatefulWidget {
   const PlayContent({super.key});
@@ -17,119 +19,183 @@ class PlayContent extends StatefulWidget {
 }
 
 class _PlayContentState extends State<PlayContent> {
+  final user = FirebaseAuth.instance.currentUser!;
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Divider(
-            height: 1,
-            indent: 0,
-            endIndent: 0,
-          ),
-          MaterialBanner(
-              padding: EdgeInsets.all(20),
-              content: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Image(
-                        image: AssetImage("images/PT_Premium_icon.png"),
-                        width: 20,
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text("een stap voor zijn".toUpperCase(),
-                          style: GoogleFonts.roboto(
-                              fontSize: 16,
-                              decoration: TextDecoration.none,
-                              fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  // ignore: prefer_const_constructors
-                  Text(
-                      "Ontvang meldingen voor beschikbare velden, geef je wedstrijden meer zichtbaarheid en ontdek jouw geavanceerde statistieken")
-                ],
-              ),
-              actions: <Widget>[
-                IconButton(
-                  onPressed: null,
-                  icon: SvgPicture.asset(
-                    "images/chevron-forward-outline.svg",
-                    height: 28,
-                    colorFilter:
-                        ColorFilter.mode(Colors.grey.shade800, BlendMode.srcIn),
-                  ),
-                )
-              ]),
+          FutureBuilder(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user.email)
+                  .get(),
+              builder: (ctx, AsyncSnapshot snapshot) {
+                if (snapshot.hasData) {
+                  var userData = snapshot.data!.data();
+
+                  if (userData!["hasPremium"]) {
+                    return const SizedBox(
+                      height: 0,
+                    );
+                  } else {
+                    return Column(
+                      children: [
+                        const Divider(
+                          height: 1,
+                          indent: 0,
+                          endIndent: 0,
+                        ),
+                        MaterialBanner(
+                            padding: const EdgeInsets.all(20),
+                            content: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    const Image(
+                                      image: AssetImage(
+                                          "images/PT_Premium_icon.png"),
+                                      width: 20,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text("een stap voor zijn".toUpperCase(),
+                                        style: GoogleFonts.roboto(
+                                            fontSize: 16,
+                                            decoration: TextDecoration.none,
+                                            fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                // ignore: prefer_const_constructors
+                                Text(
+                                    "Ontvang meldingen voor beschikbare velden, geef je wedstrijden meer zichtbaarheid en ontdek jouw geavanceerde statistieken")
+                              ],
+                            ),
+                            actions: <Widget>[
+                              IconButton(
+                                onPressed: null,
+                                icon: SvgPicture.asset(
+                                  "images/chevron-forward-outline.svg",
+                                  height: 28,
+                                  colorFilter: ColorFilter.mode(
+                                      Colors.grey.shade800, BlendMode.srcIn),
+                                ),
+                              )
+                            ]),
+                      ],
+                    );
+                  }
+                } else {
+                  return const SizedBox(
+                    height: 0,
+                  );
+                }
+              }),
           const SizedBox(
             height: 20,
           ),
-          // ignore: prefer_const_constructors
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            // ignore: prefer_const_constructors
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Aankomende reserveringen...",
-                  style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 2, color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Icon(Icons.sports_tennis_outlined),
-                          ),
-                          const SizedBox(
-                            width: 30,
-                          ),
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Wijzig jouw spelersvoorkeuren",
-                                    style: GoogleFonts.roboto(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
-                                const Text(
-                                  "Voorkeurshand, positie, wedstrijd type, mijn velden",
-                                  overflow: TextOverflow.ellipsis,
-                                )
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const IconButton(
-                              onPressed: null,
-                              icon: Icon(Icons.arrow_right_alt_outlined))
-                        ],
-                      ),
-                    )),
-                const SizedBox(
-                  height: 30,
-                ),
+                FutureBuilder(
+                    future: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.email)
+                        .get(),
+                    builder: (ctx, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        var userData = snapshot.data!.data();
+                        Map<String, dynamic> preferences =
+                            userData["preferences"];
+
+                        if (preferences["hand"] != -1 &&
+                            preferences["position"] != -1 &&
+                            preferences["type"] != -1 &&
+                            preferences["favTime"] != -1) {
+                          return const SizedBox(
+                            height: 0,
+                          );
+                        } else {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Aankomende reserveringen...",
+                                style: GoogleFonts.roboto(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 2,
+                                          color: Colors.grey.shade300),
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: Colors.white),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: Icon(
+                                              Icons.sports_tennis_outlined),
+                                        ),
+                                        const SizedBox(
+                                          width: 30,
+                                        ),
+                                        Flexible(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  "Wijzig jouw spelersvoorkeuren",
+                                                  style: GoogleFonts.roboto(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16)),
+                                              const Text(
+                                                "Voorkeurshand, positie, wedstrijd type, mijn velden",
+                                                overflow: TextOverflow.ellipsis,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        const IconButton(
+                                            onPressed: null,
+                                            icon: Icon(
+                                                Icons.arrow_right_alt_outlined))
+                                      ],
+                                    ),
+                                  )),
+                              const SizedBox(
+                                height: 30,
+                              ),
+                            ],
+                          );
+                        }
+                      } else {
+                        return const SizedBox(
+                          height: 0,
+                        );
+                      }
+                    }),
                 Text(
                   "Vind jouw perfecte wedstrijd",
                   style: GoogleFonts.roboto(
