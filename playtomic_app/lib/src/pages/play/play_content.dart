@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:getwidget/components/button/gf_button.dart';
+import 'package:getwidget/shape/gf_button_shape.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:playtomic_app/src/pages/play/club_card.dart';
+import 'package:playtomic_app/src/pages/play/play_card.dart';
 
 class PlayContent extends StatefulWidget {
   const PlayContent({super.key});
@@ -84,9 +89,41 @@ class _PlayContentState extends State<PlayContent> {
                             Border.all(width: 2, color: Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(20),
                         color: Colors.white),
-                    child: const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text("Wijzig jouw spelersvoorkeuren"),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Icon(Icons.sports_tennis_outlined),
+                          ),
+                          const SizedBox(
+                            width: 30,
+                          ),
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Wijzig jouw spelersvoorkeuren",
+                                    style: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16)),
+                                const Text(
+                                  "Voorkeurshand, positie, wedstrijd type, mijn velden",
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          const IconButton(
+                              onPressed: null,
+                              icon: Icon(Icons.arrow_right_alt_outlined))
+                        ],
+                      ),
                     )),
                 const SizedBox(
                   height: 30,
@@ -156,16 +193,69 @@ class _PlayContentState extends State<PlayContent> {
                 const SizedBox(
                   height: 10,
                 ),
-                Container(
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 2, color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white),
-                    child: const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text("Wijzig jouw spelersvoorkeuren"),
-                    )),
+                SizedBox(
+                  height: 300,
+                  child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Container(
+                              width: 200,
+                              height: 300,
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 2, color: Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.white),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                child: Column(
+                                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    const Icon(Icons.location_on_outlined,
+                                        size: 50),
+                                    const SizedBox(
+                                      height: 30,
+                                    ),
+                                    Text(
+                                      "Zoek clubs bij jou in de buurt",
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    const Text("Locatie activeren"),
+                                    const SizedBox(
+                                      height: 50,
+                                    ),
+                                    GFButton(
+                                      onPressed: () {},
+                                      text: "Inschakelen",
+                                      textColor: Colors.white,
+                                      shape: GFButtonShape.pills,
+                                      fullWidthButton: true,
+                                      color: Colors.indigoAccent.shade700,
+                                    )
+                                  ],
+                                ),
+                              )),
+                        ),
+                        const ClubCard(
+                            title: "Urban Padel Brussels",
+                            location: "Anderlecht",
+                            image: NetworkImage(
+                                "https://res.cloudinary.com/playtomic/image/upload/v1668930158/pro/tenants/71aa8a9f-a7cd-47e8-8e0c-8af69ba2c1a7/1668930157916.jpg")),
+                        //const ClubCard()
+                      ]),
+                ),
                 const SizedBox(
                   height: 30,
                 ),
@@ -196,77 +286,5 @@ class _PlayContentState extends State<PlayContent> {
         ],
       ),
     );
-  }
-}
-
-class PlayCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final String? description;
-  final String? imagePath;
-
-  PlayCard(
-      {super.key,
-      required this.title,
-      required this.icon,
-      this.description,
-      this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          border: Border.all(width: 2, color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-        ),
-        child: Stack(
-          children: [
-            if (imagePath != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Image.asset(imagePath!, height: 75, fit: BoxFit.fitWidth),
-                ],
-              ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (imagePath != null)
-                    const SizedBox(
-                      height: 30,
-                    ),
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color.fromARGB(255, 32, 32, 32)),
-                    width: 50,
-                    height: 50,
-                    child: Icon(icon, size: 30, color: Colors.white),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    title,
-                    style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                  ),
-                  if (description != null)
-                    const SizedBox(
-                      height: 5,
-                    ),
-                  if (description != null)
-                    Text(
-                      description!,
-                      style: GoogleFonts.roboto(),
-                    )
-                ],
-              ),
-            ),
-          ],
-        ));
   }
 }

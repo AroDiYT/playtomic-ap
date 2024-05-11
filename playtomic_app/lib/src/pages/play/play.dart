@@ -3,7 +3,9 @@ import 'package:playtomic_app/src/pages/play/play_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 
 class Play extends StatefulWidget {
-  const Play({super.key});
+  const Play({
+    super.key,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -15,6 +17,7 @@ class _PlayState extends State<Play> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          scrolledUnderElevation: 0,
           toolbarHeight: 80,
           title: const Row(mainAxisSize: MainAxisSize.min, children: [
             Padding(
