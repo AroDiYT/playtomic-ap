@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  const Register({super.key});
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -34,8 +33,8 @@ class _RegisterState extends State<Register> {
         email: _emailController.text.trim(),
         password: _pwController.text.trim());
 
-    addUserDetails(_nameController.text.trim(), _emailController.text.trim(),
-        _telController.text.trim());
+    await addUserDetails(_nameController.text.trim(),
+        _emailController.text.trim(), _telController.text.trim());
 
     Navigator.pop(context);
   }

@@ -15,7 +15,7 @@ class _ProfileContentState extends State<ProfileContent> {
     return DefaultTabController(
       length: 2,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           TabBar(
               indicatorSize: TabBarIndicatorSize.tab,
@@ -35,6 +35,18 @@ class _ProfileContentState extends State<ProfileContent> {
               Text("Posts"),
             ]),
           ),
+
+          // ConstrainedBox(
+          //   constraints: const BoxConstraints(maxHeight: 1000, maxWidth: 1000),
+          //   child: const SingleChildScrollView(
+          //     child: TabBarView(
+          //       children: [
+          //         ProfileActivities(),
+          //         Text("Posts"),
+          //       ],
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

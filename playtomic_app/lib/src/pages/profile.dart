@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 // ignore: unused_import
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -54,20 +53,20 @@ class _ProfileState extends State<Profile> {
                 .snapshots(),
             builder: (ctx, snapshot) {
               if (snapshot.hasData) {
-                final uData = snapshot.data!.data() as Map<String, dynamic>;
+                final uData = snapshot.data?.data() as Map<String, dynamic>?;
 
                 return SingleChildScrollView(
                   child: Center(
                     child: Column(
                       children: [
-                        Text("signed in as ${user.email!}"),
+                        Text(
+                            "signed in as ${user.email!}; has account = {uData != null}"),
                         MaterialButton(
                             onPressed: () {
                               FirebaseAuth.instance.signOut();
                             },
                             color: Colors.grey,
                             child: const Text("Sign Out")),
-
                         Column(
                           children: [
                             // Avatar and name:
@@ -78,26 +77,29 @@ class _ProfileState extends State<Profile> {
                                   child: GFAvatar(
                                     backgroundColor: Colors.indigo.shade900,
                                     child: Text(
-                                      uData['name']
-                                          .toString()
-                                          .trim()
-                                          .split(' ')
-                                          .map((l) => l[0])
-                                          .take(2)
-                                          .join(),
+                                      uData != null
+                                          ? uData['name']
+                                          : "undefined"
+                                              .toString()
+                                              .trim()
+                                              .split(' ')
+                                              .map((l) => l[0])
+                                              .take(2)
+                                              .join(),
                                       style: const TextStyle(
                                           letterSpacing: 3,
                                           color: Colors.white,
                                           fontSize: 20),
                                     ),
-
                                   ),
                                 ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      uData['name'],
+                                      uData != null
+                                          ? uData['name']
+                                          : "undefined",
                                       style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold),

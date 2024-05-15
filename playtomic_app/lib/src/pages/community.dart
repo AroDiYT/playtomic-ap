@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:playtomic_app/src/Match/match.dart';
+import 'package:playtomic_app/src/Match/match_card.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 
 class Community extends StatefulWidget {
   const Community({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
+  
   _CommunityState createState() => _CommunityState();
+}
+void _handleCreateMatch(clubLocation) {
+  if (clubLocation != null) {
+    createEmptyMatch(clubLocation!);
+  } else {
+    
+    print("failed");
+  }
 }
 
 class _CommunityState extends State<Community> {
@@ -41,7 +51,39 @@ class _CommunityState extends State<Community> {
                 },
                 icon: const Icon(Icons.notifications_none_outlined))
           ]),
-      body: const Text("Community Page"),
+      body: CreateMatchCard(
+        onTap: () {
+          
+          
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Select Club Location'),
+                content: const Text('Choose the club location for the match.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); 
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      
+                      var clubLocation = 'Select Club';
+                      Navigator.pop(context);
+                      
+                      _handleCreateMatch(clubLocation);
+                    },
+                    child: const Text('Select'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
