@@ -23,42 +23,11 @@ class AuthPage extends StatelessWidget {
           const SizedBox(
             height: 200,
           ),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              ImageIcon(
-                AssetImage("assets/images/PT_logo.png"),
-                size: 40,
-                color: Colors.white,
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Text(
-                'P L A Y T O M I C',
-                style: TextStyle(
-                    fontFamily: 'Naville',
-                    fontSize: 20,
-                    decoration: TextDecoration.none,
-                    color: Colors.white),
-              ),
-            ],
-          ),
+          ptTitle(),
           const SizedBox(
             height: 20,
           ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text(
-              "Meld je aan voor de grootste \ncommunity van racketsporten",
-              style: GoogleFonts.roboto(
-                  textStyle: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      decoration: TextDecoration.none,
-                      fontWeight: FontWeight.w300)),
-            ),
-          ),
+          subTitle(),
           Padding(
             padding: const EdgeInsets.all(8),
             child: Text(
@@ -74,67 +43,8 @@ class AuthPage extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-            child: GFButton(
-              onPressed: () {
-                Navigator.of(context).push(PageRouteBuilder(
-                  opaque: false,
-                  pageBuilder: (ctx, __, ___) => const Register(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(0.0, 1.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
-
-                    final tween = Tween(begin: begin, end: end);
-                    final curvedAnimation = CurvedAnimation(
-                      parent: animation,
-                      curve: curve,
-                    );
-
-                    return SlideTransition(
-                        position: tween.animate(curvedAnimation), child: child);
-                  },
-                ));
-              },
-              text: "Inschrijven",
-              shape: GFButtonShape.pills,
-              fullWidthButton: true,
-              color: Colors.indigoAccent.shade700,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-            child: GFButton(
-              onPressed: () {
-                Navigator.of(context).push(PageRouteBuilder(
-                  opaque: false,
-                  pageBuilder: (ctx, __, ___) => const LoginPage(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(0.0, 1.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
-
-                    final tween = Tween(begin: begin, end: end);
-                    final curvedAnimation = CurvedAnimation(
-                      parent: animation,
-                      curve: curve,
-                    );
-
-                    return SlideTransition(
-                        position: tween.animate(curvedAnimation), child: child);
-                  },
-                ));
-              },
-              text: "Aanmelden",
-              shape: GFButtonShape.pills,
-              fullWidthButton: true,
-              color: Colors.white,
-              type: GFButtonType.outline,
-            ),
-          ),
+          registerBtn(context),
+          loginBtn(context),
           const SizedBox(
             height: 20,
           ),
@@ -153,39 +63,157 @@ class AuthPage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                GFIconButton(
-                  onPressed: () {},
-                  icon: Image.asset(
-                    "assets/images/f_logo.png",
-                  ),
-                  color: const Color.fromARGB(255, 0x08, 0x66, 0xff),
-                ),
+                facebookBtn(),
                 const SizedBox(
                   width: 30,
                 ),
-                GFIconButton(
-                    icon: Image.asset("assets/images/g_logo.png"),
-                    color: Colors.white,
-                    onPressed: () {})
+                googleBtn()
               ],
             ),
           ),
           const SizedBox(
             height: 20,
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: Text(
-                "Door te registreren accepteer je onze gebruikersvoorwaarden en privacybeleid",
-                style: GoogleFonts.roboto(
-                    textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        decoration: TextDecoration.none,
-                        fontWeight: FontWeight.w400))),
-          )
+          footer()
         ],
       ),
+    );
+  }
+
+  Padding footer() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      child: Text(
+          "Door te registreren accepteer je onze gebruikersvoorwaarden en privacybeleid",
+          style: GoogleFonts.roboto(
+              textStyle: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  decoration: TextDecoration.none,
+                  fontWeight: FontWeight.w400))),
+    );
+  }
+
+  GFIconButton googleBtn() {
+    return GFIconButton(
+        icon: Image.asset("assets/images/g_logo.png"),
+        color: Colors.white,
+        onPressed: () {});
+  }
+
+  GFIconButton facebookBtn() {
+    return GFIconButton(
+      onPressed: () {},
+      icon: Image.asset(
+        "assets/images/f_logo.png",
+      ),
+      color: const Color.fromARGB(255, 0x08, 0x66, 0xff),
+    );
+  }
+
+  Padding loginBtn(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+      child: GFButton(
+        onPressed: () {
+          Navigator.of(context).push(PageRouteBuilder(
+            opaque: false,
+            pageBuilder: (ctx, __, ___) => const LoginPage(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              final tween = Tween(begin: begin, end: end);
+              final curvedAnimation = CurvedAnimation(
+                parent: animation,
+                curve: curve,
+              );
+
+              return SlideTransition(
+                  position: tween.animate(curvedAnimation), child: child);
+            },
+          ));
+        },
+        text: "Aanmelden",
+        shape: GFButtonShape.pills,
+        fullWidthButton: true,
+        color: Colors.white,
+        type: GFButtonType.outline,
+      ),
+    );
+  }
+
+  Padding registerBtn(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+      child: GFButton(
+        onPressed: () {
+          Navigator.of(context).push(PageRouteBuilder(
+            opaque: false,
+            pageBuilder: (ctx, __, ___) => const Register(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              final tween = Tween(begin: begin, end: end);
+              final curvedAnimation = CurvedAnimation(
+                parent: animation,
+                curve: curve,
+              );
+
+              return SlideTransition(
+                  position: tween.animate(curvedAnimation), child: child);
+            },
+          ));
+        },
+        text: "Inschrijven",
+        shape: GFButtonShape.pills,
+        fullWidthButton: true,
+        color: Colors.indigoAccent.shade700,
+      ),
+    );
+  }
+
+  Padding subTitle() {
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Text(
+        "Meld je aan voor de grootste \ncommunity van racketsporten",
+        style: GoogleFonts.roboto(
+            textStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                decoration: TextDecoration.none,
+                fontWeight: FontWeight.w300)),
+      ),
+    );
+  }
+
+  Row ptTitle() {
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        ImageIcon(
+          AssetImage("assets/images/PT_logo.png"),
+          size: 40,
+          color: Colors.white,
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        Text(
+          'P L A Y T O M I C',
+          style: TextStyle(
+              fontFamily: 'Naville',
+              fontSize: 20,
+              decoration: TextDecoration.none,
+              color: Colors.white),
+        ),
+      ],
     );
   }
 }
