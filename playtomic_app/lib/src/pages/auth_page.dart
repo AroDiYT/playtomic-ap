@@ -80,7 +80,7 @@ class AuthPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(PageRouteBuilder(
                   opaque: false,
-                  pageBuilder: (ctx, __, ___) => Register(),
+                  pageBuilder: (ctx, __, ___) => const Register(),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(0.0, 1.0);
@@ -110,7 +110,7 @@ class AuthPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(PageRouteBuilder(
                   opaque: false,
-                  pageBuilder: (ctx, __, ___) => LoginPage(),
+                  pageBuilder: (ctx, __, ___) => const LoginPage(),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(0.0, 1.0);
