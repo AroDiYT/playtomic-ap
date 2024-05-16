@@ -29,23 +29,7 @@ class _ProfileState extends State<Profile> {
               style:
                   GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            actions: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.restorablePushNamed(
-                        context, SettingsView.routeName);
-                  },
-                  icon: const Icon(Icons.chat_bubble_outline)),
-              IconButton(
-                  onPressed: () {
-                    Navigator.restorablePushNamed(
-                        context, SettingsView.routeName);
-                  },
-                  icon: const Icon(
-                    Icons.menu,
-                    size: 26,
-                  ))
-            ]),
+            actions: [chatsBtn(context), hamburgerBtn(context)]),
         body: StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('users')
@@ -59,14 +43,6 @@ class _ProfileState extends State<Profile> {
                   child: Center(
                     child: Column(
                       children: [
-                        Text("signed in as ${user.email!}"),
-                        MaterialButton(
-                            onPressed: () {
-                              FirebaseAuth.instance.signOut();
-                            },
-                            color: Colors.grey,
-                            child: const Text("Sign Out")),
-
                         Column(
                           children: [
                             // Avatar and name:
@@ -89,7 +65,6 @@ class _ProfileState extends State<Profile> {
                                           color: Colors.white,
                                           fontSize: 20),
                                     ),
-
                                   ),
                                 ),
                                 Column(
@@ -217,5 +192,84 @@ class _ProfileState extends State<Profile> {
                 return const Center(child: Text('Loading..'));
               }
             }));
+  }
+
+  IconButton hamburgerBtn(BuildContext context) {
+    return IconButton(
+        onPressed: () {
+          Navigator.of(context).push(PageRouteBuilder(
+            opaque: false,
+            pageBuilder: (ctx, __, ___) => Scaffold(
+              appBar: AppBar(
+                  leading: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.close))),
+              backgroundColor: Colors.white,
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [Text("Koen"), Text("Standaard account")],
+                        ),
+                        GFAvatar(
+                          backgroundColor: Colors.indigo.shade900,
+                          child: const Text(
+                            "K",
+                            style: TextStyle(
+                                letterSpacing: 3,
+                                color: Colors.white,
+                                fontSize: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text("signed in as ${user.email!}"),
+                    MaterialButton(
+                        onPressed: () {
+                          FirebaseAuth.instance.signOut();
+                          Navigator.pop(context);
+                        },
+                        color: Colors.grey,
+                        child: const Text("Sign Out")),
+                  ],
+                ),
+              ),
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+
+              final tween = Tween(begin: begin, end: end);
+              final curvedAnimation = CurvedAnimation(
+                parent: animation,
+                curve: curve,
+              );
+
+              return SlideTransition(
+                  position: tween.animate(curvedAnimation), child: child);
+            },
+          ));
+        },
+        icon: const Icon(
+          Icons.menu,
+          size: 26,
+        ));
+  }
+
+  IconButton chatsBtn(BuildContext context) {
+    return IconButton(
+        onPressed: () {
+          Navigator.restorablePushNamed(context, SettingsView.routeName);
+        },
+        icon: const Icon(Icons.chat_bubble_outline));
   }
 }
