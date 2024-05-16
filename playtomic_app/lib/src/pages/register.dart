@@ -40,10 +40,13 @@ class _RegisterState extends State<Register> {
   }
 
   Future addUserDetails(String name, String email, String tel) async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(email)
-        .set({'name': name, 'email': email, 'tel': tel});
+    await FirebaseFirestore.instance.collection('users').doc(email).set({
+      'name': name,
+      'email': email,
+      'tel': tel,
+      'preferences': {'favTime': -1, 'hand': -1, 'position': -1, 'type': -1},
+      'hasPremium': false
+    });
   }
 
   @override
