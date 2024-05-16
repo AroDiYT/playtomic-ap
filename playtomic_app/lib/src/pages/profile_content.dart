@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:playtomic_app/src/pages/profile_activities.dart';
+import 'package:playtomic_app/src/user.dart';
 
 class ProfileContent extends StatefulWidget {
-  const ProfileContent({super.key});
+  AppUser user;
+
+  ProfileContent({super.key, required this.user});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ProfileContentState createState() => _ProfileContentState();
 }
 
@@ -26,12 +28,12 @@ class _ProfileContentState extends State<ProfileContent> {
                 Tab(text: "Activiteiten"),
                 Tab(text: "Posts"),
               ]),
-          const SizedBox(
+          SizedBox(
             //Add this to give height
             height: 1000, //TODO: Find better solution to make this scrollable
             child:
                 TabBarView(physics: NeverScrollableScrollPhysics(), children: [
-              ProfileActivities(),
+              ProfileActivities(user: widget.user),
               Text("Posts"),
             ]),
           ),

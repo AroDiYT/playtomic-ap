@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:playtomic_app/src/user.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -40,13 +41,10 @@ class _RegisterState extends State<Register> {
   }
 
   Future addUserDetails(String name, String email, String tel) async {
-    await FirebaseFirestore.instance.collection('users').doc(email).set({
-      'name': name,
-      'email': email,
-      'tel': tel,
-      'preferences': {'favTime': -1, 'hand': -1, 'position': -1, 'type': -1},
-      'hasPremium': false
-    });
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(email)
+        .set(AppUser(email: email, name: name, tel: tel).toMap());
   }
 
   @override

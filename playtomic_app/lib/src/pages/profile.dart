@@ -5,6 +5,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
+import 'package:playtomic_app/src/user.dart';
 // ignore: unused_import
 
 class Profile extends StatefulWidget {
@@ -16,185 +17,193 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final user = FirebaseAuth.instance.currentUser!;
+  Future<AppUser> getUser() async {
+    var snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.email)
+        .snapshots()
+        .first;
+
+    final uData = snapshot.data() as Map<String, dynamic>;
+
+    return AppUser(
+        email: uData['email'], name: uData['name'], tel: uData['tel']);
+  }
+
+  updateUser(AppUser user) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.email)
+        .set(user.toMap());
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-            toolbarHeight: 80,
-            centerTitle: true,
-            title: Text(
-              'Profile',
-              style:
-                  GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            actions: [chatsBtn(context), hamburgerBtn(context)]),
-        body: StreamBuilder<DocumentSnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('users')
-                .doc(user.email)
-                .snapshots(),
-            builder: (ctx, snapshot) {
-              if (snapshot.hasData) {
-                final uData = snapshot.data!.data() as Map<String, dynamic>;
+    return FutureBuilder(
+        future: getUser(),
+        builder: (ctx, snapshot) {
+          if (snapshot.hasData) {
+            var user = snapshot.data!;
 
-                return SingleChildScrollView(
+            return Scaffold(
+                appBar: AppBar(
+                    toolbarHeight: 80,
+                    centerTitle: true,
+                    title: Text(
+                      'Profile',
+                      style: GoogleFonts.roboto(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    actions: [chatsBtn(context), hamburgerBtn(context, user)]),
+                body: SingleChildScrollView(
                   child: Center(
                     child: Column(
                       children: [
                         Column(
                           children: [
                             // Avatar and name:
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(15),
-                                  child: GFAvatar(
-                                    backgroundColor: Colors.indigo.shade900,
-                                    child: Text(
-                                      uData['name']
-                                          .toString()
-                                          .trim()
-                                          .split(' ')
-                                          .map((l) => l[0])
-                                          .take(2)
-                                          .join(),
-                                      style: const TextStyle(
-                                          letterSpacing: 3,
-                                          color: Colors.white,
-                                          fontSize: 20),
-                                    ),
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      uData['name'],
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      "Voeg mijn locatie toe",
-                                      style: TextStyle(
-                                          color: Colors.blue.shade700,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
+                            heading(user.name),
                             // Wedstrijden, Volgers and Volgend:
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: IntrinsicHeight(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {},
-                                      child: const Column(
-                                        children: [
-                                          Text(
-                                            "0",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 20),
-                                          ),
-                                          Text(
-                                            "Wedstrijden",
-                                            style:
-                                                TextStyle(color: Colors.black),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const VerticalDivider(
-                                      thickness: 1,
-                                      color: Colors.grey,
-                                    ),
-                                    TextButton(
-                                        onPressed: () {},
-                                        child: const Column(
-                                          children: [
-                                            Text(
-                                              "0",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 20),
-                                            ),
-                                            Text("Volgers",
-                                                style: TextStyle(
-                                                    color: Colors.black)),
-                                          ],
-                                        )),
-                                    const VerticalDivider(
-                                      thickness: 1,
-                                      color: Colors.grey,
-                                    ),
-                                    TextButton(
-                                        onPressed: () {},
-                                        child: const Column(
-                                          children: [
-                                            Text(
-                                              "0",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 20),
-                                            ),
-                                            Text("Volgend",
-                                                style: TextStyle(
-                                                    color: Colors.black)),
-                                          ],
-                                        )),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            stats(),
                             // Edit Profile and Get Premium:
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               mainAxisSize: MainAxisSize.max,
-                              children: [
-                                SizedBox(
-                                  width: 180,
-                                  child: GFButton(
-                                      onPressed: () {},
-                                      color: Colors.indigo.shade900,
-                                      shape: GFButtonShape.pills,
-                                      type: GFButtonType.outline,
-                                      child: const Text("Profiel Bewerken")),
-                                ),
-                                SizedBox(
-                                  width: 180,
-                                  child: GFButton(
-                                      onPressed: () {},
-                                      color: Colors.indigo.shade900,
-                                      textColor: Colors.amber,
-                                      shape: GFButtonShape.pills,
-                                      child: const Text("Ga voor Premium")),
-                                )
-                              ],
+                              children: [editProfileBtn(), getPremiumBtn()],
                             ),
                             // Activiteiten and Posts
-                            const ProfileContent()
+                            ProfileContent(
+                              user: user,
+                            )
                           ],
                         )
                       ],
                     ),
                   ),
-                );
-              } else {
-                return const Center(child: Text('Loading..'));
-              }
-            }));
+                ));
+          } else {
+            return const Text("Loading");
+          }
+        });
   }
 
-  IconButton hamburgerBtn(BuildContext context) {
+  SizedBox getPremiumBtn() {
+    return SizedBox(
+      width: 180,
+      child: GFButton(
+          onPressed: () {},
+          color: Colors.indigo.shade900,
+          textColor: Colors.amber,
+          shape: GFButtonShape.pills,
+          child: const Text("Ga voor Premium")),
+    );
+  }
+
+  SizedBox editProfileBtn() {
+    return SizedBox(
+      width: 180,
+      child: GFButton(
+          onPressed: () {},
+          color: Colors.indigo.shade900,
+          shape: GFButtonShape.pills,
+          type: GFButtonType.outline,
+          child: const Text("Profiel Bewerken")),
+    );
+  }
+
+  Padding stats() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+      child: IntrinsicHeight(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextButton(
+              onPressed: () {},
+              child: const Column(
+                children: [
+                  Text(
+                    "0",
+                    style: TextStyle(color: Colors.black, fontSize: 20),
+                  ),
+                  Text(
+                    "Wedstrijden",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
+            ),
+            const VerticalDivider(
+              thickness: 1,
+              color: Colors.grey,
+            ),
+            TextButton(
+                onPressed: () {},
+                child: const Column(
+                  children: [
+                    Text(
+                      "0",
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                    Text("Volgers", style: TextStyle(color: Colors.black)),
+                  ],
+                )),
+            const VerticalDivider(
+              thickness: 1,
+              color: Colors.grey,
+            ),
+            TextButton(
+                onPressed: () {},
+                child: const Column(
+                  children: [
+                    Text(
+                      "0",
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                    ),
+                    Text("Volgend", style: TextStyle(color: Colors.black)),
+                  ],
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Row heading(String name) {
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(15),
+          child: GFAvatar(
+            backgroundColor: Colors.indigo.shade900,
+            child: Text(
+              name.toString().trim().split(' ').map((l) => l[0]).take(2).join(),
+              style: const TextStyle(
+                  letterSpacing: 3, color: Colors.white, fontSize: 20),
+            ),
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              name,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "Voeg mijn locatie toe",
+              style: TextStyle(
+                  color: Colors.blue.shade700,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold),
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+  IconButton hamburgerBtn(BuildContext context, AppUser user) {
     return IconButton(
         onPressed: () {
           Navigator.of(context).push(PageRouteBuilder(
@@ -205,7 +214,7 @@ class _ProfileState extends State<Profile> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      icon: Icon(Icons.close))),
+                      icon: const Icon(Icons.close))),
               backgroundColor: Colors.white,
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
