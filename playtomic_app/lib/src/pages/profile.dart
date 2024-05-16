@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile_activities.dart';
-import 'package:playtomic_app/src/pages/profile_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 import 'package:playtomic_app/src/user.dart';
 // ignore: unused_import
@@ -18,7 +17,26 @@ class Profile extends StatefulWidget {
   _ProfileState createState() => _ProfileState();
 }
 
-class _ProfileState extends State<Profile> {
+class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
+  static const List<Tab> myTabs = <Tab>[
+    Tab(text: "Activiteiten"),
+    Tab(text: "Posts"),
+  ];
+
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(vsync: this, length: myTabs.length);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   Future<AppUser> getUser() async {
     var snapshot = await FirebaseFirestore.instance
         .collection('users')
@@ -79,18 +97,13 @@ class _ProfileState extends State<Profile> {
                     SliverAppBar(
                       scrolledUnderElevation: 0,
                       pinned: true,
-                      title: DefaultTabController(
-                        length: 2,
-                        child: TabBar(
-                            indicatorSize: TabBarIndicatorSize.tab,
-                            labelColor: Colors.indigo.shade900,
-                            indicatorColor: Colors.indigo.shade900,
-                            splashFactory: NoSplash.splashFactory,
-                            tabs: const [
-                              Tab(text: "Activiteiten"),
-                              Tab(text: "Posts"),
-                            ]),
-                      ),
+                      title: TabBar(
+                          controller: _tabController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          labelColor: Colors.indigo.shade900,
+                          indicatorColor: Colors.indigo.shade900,
+                          splashFactory: NoSplash.splashFactory,
+                          tabs: myTabs),
                     ),
                     SliverList(
                         delegate: SliverChildListDelegate([
@@ -101,6 +114,7 @@ class _ProfileState extends State<Profile> {
                         child: DefaultTabController(
                           length: 2,
                           child: TabBarView(
+                              controller: _tabController,
                               physics: NeverScrollableScrollPhysics(),
                               children: [
                                 ProfileActivities(user: user),
