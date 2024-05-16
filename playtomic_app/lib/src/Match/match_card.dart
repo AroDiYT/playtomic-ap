@@ -56,6 +56,7 @@ class CreateMatchCard extends StatelessWidget {
           selectedClub: 'Your Club',
           is1v1Mode: true,
           onSelectClub: (club) {
+            
             print('Selected club: $club');
           },
           onChangeMode: (is1v1) {

@@ -77,9 +77,9 @@ class _ProfileState extends State<Profile> {
                                   child: GFAvatar(
                                     backgroundColor: Colors.indigo.shade900,
                                     child: Text(
-                                      uData != null
+                                      (uData != null
                                           ? uData['name']
-                                          : "undefined"
+                                          : "undefined")
                                               .toString()
                                               .trim()
                                               .split(' ')
