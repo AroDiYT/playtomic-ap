@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:playtomic_app/src/pages/profile_activities.dart';
 import 'package:playtomic_app/src/pages/profile_content.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 import 'package:playtomic_app/src/user.dart';
@@ -47,6 +49,7 @@ class _ProfileState extends State<Profile> {
 
             return Scaffold(
                 appBar: AppBar(
+                    scrolledUnderElevation: 0,
                     toolbarHeight: 80,
                     centerTitle: true,
                     title: Text(
@@ -55,31 +58,58 @@ class _ProfileState extends State<Profile> {
                           fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     actions: [chatsBtn(context), hamburgerBtn(context, user)]),
-                body: SingleChildScrollView(
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Column(
-                          children: [
-                            // Avatar and name:
-                            heading(user.name),
-                            // Wedstrijden, Volgers and Volgend:
-                            stats(),
-                            // Edit Profile and Get Premium:
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              mainAxisSize: MainAxisSize.max,
-                              children: [editProfileBtn(), getPremiumBtn()],
-                            ),
-                            // Activiteiten and Posts
-                            ProfileContent(
-                              user: user,
-                            )
-                          ],
-                        )
-                      ],
+                body: CustomScrollView(
+                  slivers: [
+                    SliverList.list(children: [
+                      Column(
+                        children: [
+                          // Avatar and name:
+                          heading(user.name),
+                          // Wedstrijden, Volgers and Volgend:
+                          stats(),
+                          // Edit Profile and Get Premium:
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [editProfileBtn(), getPremiumBtn()],
+                          ),
+                        ],
+                      ),
+                    ]),
+                    SliverAppBar(
+                      scrolledUnderElevation: 0,
+                      pinned: true,
+                      title: DefaultTabController(
+                        length: 2,
+                        child: TabBar(
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            labelColor: Colors.indigo.shade900,
+                            indicatorColor: Colors.indigo.shade900,
+                            splashFactory: NoSplash.splashFactory,
+                            tabs: const [
+                              Tab(text: "Activiteiten"),
+                              Tab(text: "Posts"),
+                            ]),
+                      ),
                     ),
-                  ),
+                    SliverList(
+                        delegate: SliverChildListDelegate([
+                      SizedBox(
+                        //Add this to give height
+                        height:
+                            1000, //TODO: Find better solution to make this scrollable
+                        child: DefaultTabController(
+                          length: 2,
+                          child: TabBarView(
+                              physics: NeverScrollableScrollPhysics(),
+                              children: [
+                                ProfileActivities(user: user),
+                                Text("Posts"),
+                              ]),
+                        ),
+                      ),
+                    ]))
+                  ],
                 ));
           } else {
             return const Text("Loading");
