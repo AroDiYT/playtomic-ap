@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:playtomic_app/src/pages/hamburger.dart';
 import 'package:playtomic_app/src/pages/profile_activities.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 import 'package:playtomic_app/src/user.dart';
@@ -252,49 +253,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         onPressed: () {
           Navigator.of(context).push(PageRouteBuilder(
             opaque: false,
-            pageBuilder: (ctx, __, ___) => Scaffold(
-              appBar: AppBar(
-                  leading: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.close))),
-              backgroundColor: Colors.white,
-              body: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [Text("Koen"), Text("Standaard account")],
-                        ),
-                        GFAvatar(
-                          backgroundColor: Colors.indigo.shade900,
-                          child: const Text(
-                            "K",
-                            style: TextStyle(
-                                letterSpacing: 3,
-                                color: Colors.white,
-                                fontSize: 20),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text("signed in as ${user.email!}"),
-                    MaterialButton(
-                        onPressed: () {
-                          FirebaseAuth.instance.signOut();
-                          Navigator.pop(context);
-                        },
-                        color: Colors.grey,
-                        child: const Text("Sign Out")),
-                  ],
-                ),
-              ),
-            ),
+            pageBuilder: (ctx, __, ___) => Hamburger(user: user),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 1.0);
