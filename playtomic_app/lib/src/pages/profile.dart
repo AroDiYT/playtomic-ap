@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/hamburger.dart';
@@ -116,10 +115,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           length: 2,
                           child: TabBarView(
                               controller: _tabController,
-                              physics: NeverScrollableScrollPhysics(),
+                              physics: const NeverScrollableScrollPhysics(),
                               children: [
                                 ProfileActivities(user: user),
-                                Text("Posts"),
+                                const Text("Posts"),
                               ]),
                         ),
                       ),

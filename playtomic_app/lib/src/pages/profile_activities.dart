@@ -62,7 +62,7 @@ class ProfilePreferences extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               color: Colors.white),
           child: Padding(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 const Text(
@@ -99,7 +99,7 @@ class ProfilePreferences extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               color: Colors.white),
           child: Padding(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 const Text(

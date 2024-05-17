@@ -2,5 +2,10 @@
     "cSpell.words": [
         "playtomic",
         "roboto"
-    ]
+    ],
+
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit"
+    }
+      
 }
