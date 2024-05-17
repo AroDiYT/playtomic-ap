@@ -19,15 +19,17 @@ class _HamburgerState extends State<Hamburger> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.close))),
-      backgroundColor: Colors.white,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.close)),
+        backgroundColor: Colors.grey.shade100,
+      ),
+      backgroundColor: Colors.grey.shade100,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -57,34 +59,15 @@ class _HamburgerState extends State<Hamburger> {
                   ),
                 ],
               ),
+              const SizedBox(
+                height: 20,
+              ),
               Row(children: [
-                SizedBox(
-                  width: 150,
-                  height: 30,
-                  child: GFButton(
-                    onPressed: () {},
-                    color: Colors.indigo.shade900,
-                    shape: GFButtonShape.pills,
-                    textColor: Colors.amber,
-                    text: "Ga voor Premium",
-                    textStyle: const TextStyle(fontSize: 12),
-                  ),
-                ),
+                getPremiumBtn(),
                 const SizedBox(
                   width: 20,
                 ),
-                SizedBox(
-                  width: 150,
-                  height: 30,
-                  child: GFButton(
-                    onPressed: () {},
-                    color: Colors.white,
-                    textColor: Colors.blue,
-                    shape: GFButtonShape.pills,
-                    text: "Profiel delen",
-                    textStyle: const TextStyle(fontSize: 12),
-                  ),
-                ),
+                shareProfileBtn(),
               ]),
               const SizedBox(height: 20),
               Text("Mijn Account",
@@ -97,19 +80,23 @@ class _HamburgerState extends State<Hamburger> {
                     settingsCategory(
                         title: "Profiel bewerken",
                         description:
-                            "Bewerk naam, e-mail, telefoonnummer, locatie,..."),
+                            "Bewerk naam, e-mail, telefoonnummer, locatie,...",
+                        icon: Icons.person_outline),
                     settingsCategory(
                         title: "Mijn activiteit",
                         description:
-                            "Wedstrijden, klassen, competities, groepen"),
+                            "Wedstrijden, klassen, competities, groepen",
+                        icon: Icons.sports_tennis_outlined),
                     settingsCategory(
                         title: "Mijn betalingen",
                         description:
-                            "Betaalmethoden, Transacties, Lidmaadschap"),
+                            "Betaalmethoden, Transacties, Lidmaadschap",
+                        icon: Icons.wallet_outlined),
                     settingsCategory(
                         title: "Instellingen",
                         description:
-                            "Privacy, meldingen, beveiliging configureren,..."),
+                            "Privacy, meldingen, beveiliging configureren,...",
+                        icon: Icons.settings_outlined),
                   ],
                 ),
               ),
@@ -121,7 +108,8 @@ class _HamburgerState extends State<Hamburger> {
                 color: Colors.white,
                 child: Column(
                   children: [
-                    settingsCategory(title: "Help", description: ""),
+                    settingsCategory(
+                        title: "Help", icon: Icons.add_comment_outlined),
                   ],
                 ),
               ),
@@ -134,10 +122,16 @@ class _HamburgerState extends State<Hamburger> {
                 child: Column(
                   children: [
                     settingsCategory(
-                        title: "Gebruikersvoorwaarden", description: ""),
-                    settingsCategory(title: "Privacybeleid", description: ""),
+                        title: "Gebruikersvoorwaarden",
+                        icon: Icons.description_outlined),
+                    settingsCategory(
+                        title: "Privacybeleid",
+                        icon: Icons.remove_red_eye_outlined),
                   ],
                 ),
+              ),
+              const SizedBox(
+                height: 200,
               ),
               signOut(context),
             ],
@@ -147,29 +141,119 @@ class _HamburgerState extends State<Hamburger> {
     );
   }
 
-  Row settingsCategory({required String title, required String description}) {
-    return Row(
-      children: [
-        const Icon(Icons.person),
-        Column(
-          children: [Text(title), Text(description)],
+  Widget shareProfileBtn() {
+    return SizedBox(
+      width: 150,
+      height: 30,
+      child: GFButton(
+        highlightElevation: 0,
+        hoverElevation: 0,
+        onPressed: () {},
+        color: Colors.white,
+        shape: GFButtonShape.pills,
+        boxShadow:
+            const BoxShadow(color: Colors.blue, blurRadius: 0, spreadRadius: 2),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(
+                Icons.upload,
+                color: Colors.blue,
+              ),
+              Text("Profiel delen",
+                  style: TextStyle(fontSize: 12, color: Colors.blue)),
+            ],
+          ),
         ),
-        SvgPicture.asset(
-          "images/chevron-forward-outline.svg",
-          height: 28,
-          colorFilter: ColorFilter.mode(Colors.grey.shade800, BlendMode.srcIn),
-        ),
-      ],
+      ),
     );
   }
 
-  MaterialButton signOut(BuildContext context) {
-    return MaterialButton(
-        onPressed: () {
-          FirebaseAuth.instance.signOut();
-          Navigator.pop(context);
-        },
-        color: Colors.grey,
-        child: const Text("Sign Out"));
+  Widget getPremiumBtn() {
+    return SizedBox(
+      width: 150,
+      height: 30,
+      child: GFButton(
+        highlightElevation: 0,
+        hoverElevation: 0,
+        onPressed: () {},
+        color: Colors.indigo.shade900,
+        shape: GFButtonShape.pills,
+        boxShadow: BoxShadow(
+            color: Colors.indigo.shade900, blurRadius: 0, spreadRadius: 2),
+        child: const Text(
+          "Ga voor Premium",
+          style: TextStyle(fontSize: 12, color: Colors.amber),
+        ),
+      ),
+    );
+  }
+
+  Widget settingsCategory(
+      {required String title, String? description, required IconData icon}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Icon(icon),
+              const SizedBox(
+                width: 20,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  if (description != null) Text(description)
+                ],
+              ),
+            ],
+          ),
+          SvgPicture.asset(
+            "images/chevron-forward-outline.svg",
+            height: 28,
+            colorFilter:
+                ColorFilter.mode(Colors.grey.shade800, BlendMode.srcIn),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget signOut(BuildContext context) {
+    return GFButton(
+      hoverElevation: 0,
+      highlightElevation: 0,
+      type: GFButtonType.transparent,
+      onPressed: () {
+        FirebaseAuth.instance.signOut();
+        Navigator.pop(context);
+      },
+      child: const Row(
+        children: [
+          Icon(
+            Icons.power_settings_new_outlined,
+            color: Colors.red,
+            size: 24,
+          ),
+          SizedBox(
+            width: 20,
+          ),
+          Text(
+            "Sign Out",
+            style: TextStyle(color: Colors.red, fontSize: 16),
+          ),
+        ],
+      ),
+    );
   }
 }
