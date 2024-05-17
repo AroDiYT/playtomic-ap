@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:playtomic_app/src/user.dart';
 
 class ProfileActivities extends StatefulWidget {
-  AppUser user;
+  final AppUser user;
 
-  ProfileActivities({super.key, required this.user});
+  const ProfileActivities({super.key, required this.user});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ProfileActivitiesState createState() => _ProfileActivitiesState();
 }
 
@@ -23,20 +22,13 @@ class _ProfileActivitiesState extends State<ProfileActivities> {
       ),
     );
   }
-}
 
-class ProfilePreferences extends StatelessWidget {
-  final Map<String, int> preferences;
+  Widget ProfilePreferences({required Map<String, int> preferences}) {
+    final hand = ["Rechtshandig", "Linkshandig", "Beide"];
+    final position = ["Backhand", "Forehand", "Beide helften"];
+    final gameType = ["Concurrerend", "Vriendschappelijk", "Beide"];
+    final time = ["Ochtend", "Middag", "Avond", "De hele dag"];
 
-  ProfilePreferences({super.key, required this.preferences});
-
-  final hand = ["Rechtshandig", "Linkshandig", "Beide"];
-  final position = ["Backhand", "Forehand", "Beide helften"];
-  final gameType = ["Concurrerend", "Vriendschappelijk", "Beide"];
-  final time = ["Ochtend", "Middag", "Avond", "De hele dag"];
-
-  @override
-  Widget build(BuildContext context) {
     return Column(
       children: [
         Padding(

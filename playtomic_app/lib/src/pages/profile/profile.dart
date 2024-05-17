@@ -5,6 +5,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile/hamburger.dart';
 import 'package:playtomic_app/src/pages/profile/profile_activities.dart';
+import 'package:playtomic_app/src/pages/profile/profile_posts.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 import 'package:playtomic_app/src/user.dart';
 // ignore: unused_import
@@ -118,7 +119,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               physics: const NeverScrollableScrollPhysics(),
                               children: [
                                 ProfileActivities(user: user),
-                                const Text("Posts"),
+                                const ProfilePosts(),
                               ]),
                         ),
                       ),
