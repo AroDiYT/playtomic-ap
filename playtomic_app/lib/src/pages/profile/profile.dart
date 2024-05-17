@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:playtomic_app/src/pages/hamburger.dart';
-import 'package:playtomic_app/src/pages/profile_activities.dart';
+import 'package:playtomic_app/src/pages/profile/hamburger.dart';
+import 'package:playtomic_app/src/pages/profile/profile_activities.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
 import 'package:playtomic_app/src/user.dart';
 // ignore: unused_import
