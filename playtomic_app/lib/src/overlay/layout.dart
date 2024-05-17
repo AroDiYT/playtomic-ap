@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:playtomic_app/src/pages/play/play.dart';
 import 'package:playtomic_app/src/pages/discover.dart';
 import 'package:playtomic_app/src/pages/community.dart';
-import 'package:playtomic_app/src/pages/profile.dart';
+import 'package:playtomic_app/src/pages/profile/profile.dart';
 
 /// Displays a list of SampleItems.
 class Layout extends StatefulWidget {
