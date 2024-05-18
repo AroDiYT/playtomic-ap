@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:playtomic_app/src/overlay/layout.dart';
 import 'package:playtomic_app/src/pages/auth_page.dart';
 import 'settings/settings_controller.dart';
-//import 'settings/settings_view.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {

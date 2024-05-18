@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/shape/gf_button_shape.dart';
@@ -204,7 +201,7 @@ class _PlayContentState extends State<PlayContent> {
                 const SizedBox(
                   height: 10,
                 ),
-                Column(
+                const Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,7 +212,7 @@ class _PlayContentState extends State<PlayContent> {
                                 icon: Icons.search_outlined,
                                 description: "Als je al weet met wie je speelt",
                                 imagePath: "images/loginimage_9-16.jpg")),
-                        const SizedBox(
+                        SizedBox(
                           width: 10,
                         ),
                         Expanded(
@@ -229,7 +226,7 @@ class _PlayContentState extends State<PlayContent> {
                         ),
                       ],
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 10,
                     ),
                     Row(
@@ -238,7 +235,7 @@ class _PlayContentState extends State<PlayContent> {
                         Expanded(
                             child: PlayCard(
                                 title: "Lessen", icon: Icons.school_outlined)),
-                        const SizedBox(
+                        SizedBox(
                           width: 10,
                         ),
                         Expanded(

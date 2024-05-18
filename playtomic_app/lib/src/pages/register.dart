@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:playtomic_app/src/user.dart';
 
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  const Register({super.key});
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -44,7 +44,7 @@ class _RegisterState extends State<Register> {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(email)
-        .set({'name': name, 'email': email, 'tel': tel});
+        .set(AppUser(email: email, name: name, tel: tel).toMap());
   }
 
   @override
@@ -147,7 +147,7 @@ class _RegisterState extends State<Register> {
                     InternationalPhoneNumberInput(
                         textFieldController: _telController,
                         hintText: "470888888",
-                        initialValue: PhoneNumber(isoCode: "32"),
+                        initialValue: PhoneNumber(isoCode: "BE"),
                         selectorConfig: const SelectorConfig(
                             //showFlags: false
                             ),

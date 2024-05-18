@@ -7,7 +7,7 @@ class PlayCard extends StatelessWidget {
   final String? description;
   final String? imagePath;
 
-  PlayCard(
+  const PlayCard(
       {super.key,
       required this.title,
       required this.icon,

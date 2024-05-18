@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:playtomic_app/src/user.dart';
 
 class ProfileActivities extends StatefulWidget {
-  const ProfileActivities({super.key});
+  final AppUser user;
+
+  const ProfileActivities({super.key, required this.user});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ProfileActivitiesState createState() => _ProfileActivitiesState();
 }
 
 class _ProfileActivitiesState extends State<ProfileActivities> {
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(8.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          ProfilePreferences(),
+          ProfilePreferences(preferences: widget.user.preferences),
         ],
       ),
     );
   }
-}
 
-class ProfilePreferences extends StatelessWidget {
-  const ProfilePreferences({
-    super.key,
-  });
+  Widget ProfilePreferences({required Map<String, int> preferences}) {
+    final hand = ["Rechtshandig", "Linkshandig", "Beide"];
+    final position = ["Backhand", "Forehand", "Beide helften"];
+    final gameType = ["Concurrerend", "Vriendschappelijk", "Beide"];
+    final time = ["Ochtend", "Middag", "Avond", "De hele dag"];
 
-  @override
-  Widget build(BuildContext context) {
     return Column(
       children: [
         Padding(
@@ -53,25 +53,29 @@ class ProfilePreferences extends StatelessWidget {
               border: Border.all(width: 1, color: Colors.grey),
               borderRadius: BorderRadius.circular(20),
               color: Colors.white),
-          child: const Padding(
-            padding: EdgeInsets.all(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Text(
+                const Text(
                   "👋",
                   style: TextStyle(fontSize: 18),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Beste hand"),
-                    SizedBox(
+                    const Text("Beste hand"),
+                    const SizedBox(
                       height: 5,
                     ),
-                    Text("Rechtshandig")
+                    if (preferences["hand"] != -1 &&
+                        preferences["hand"] != null)
+                      Text(hand[preferences["hand"]!])
+                    else
+                      const Text("Onbekend")
                   ],
                 )
               ],
@@ -86,25 +90,29 @@ class ProfilePreferences extends StatelessWidget {
               border: Border.all(width: 1, color: Colors.grey),
               borderRadius: BorderRadius.circular(20),
               color: Colors.white),
-          child: const Padding(
-            padding: EdgeInsets.all(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Text(
+                const Text(
                   "📍",
                   style: TextStyle(fontSize: 18),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Baanpositie"),
-                    SizedBox(
+                    const Text("Baanpositie"),
+                    const SizedBox(
                       height: 5,
                     ),
-                    Text("Forehand")
+                    if (preferences["position"] != -1 &&
+                        preferences["position"] != null)
+                      Text(position[preferences["position"]!])
+                    else
+                      const Text("Onbekend")
                   ],
                 )
               ],
@@ -119,25 +127,29 @@ class ProfilePreferences extends StatelessWidget {
               border: Border.all(width: 1, color: Colors.grey),
               borderRadius: BorderRadius.circular(20),
               color: Colors.white),
-          child: const Padding(
-            padding: EdgeInsets.all(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Text(
+                const Text(
                   "🥇",
                   style: TextStyle(fontSize: 18),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Type partij"),
-                    SizedBox(
+                    const Text("Type partij"),
+                    const SizedBox(
                       height: 5,
                     ),
-                    Text("Concurrerend")
+                    if (preferences["type"] != -1 &&
+                        preferences["type"] != null)
+                      Text(gameType[preferences["type"]!])
+                    else
+                      const Text("Onbekend")
                   ],
                 )
               ],
@@ -152,25 +164,29 @@ class ProfilePreferences extends StatelessWidget {
               border: Border.all(width: 1, color: Colors.grey),
               borderRadius: BorderRadius.circular(20),
               color: Colors.white),
-          child: const Padding(
-            padding: EdgeInsets.all(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Text(
+                const Text(
                   "🌄",
                   style: TextStyle(fontSize: 18),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Favoriete tijd om te spelen"),
-                    SizedBox(
+                    const Text("Favoriete tijd om te spelen"),
+                    const SizedBox(
                       height: 5,
                     ),
-                    Text("'s Morgens'")
+                    if (preferences["time"] != -1 &&
+                        preferences["time"] != null)
+                      Text(time[preferences["time"]!])
+                    else
+                      const Text("Onbekend")
                   ],
                 )
               ],
