@@ -1,7 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/user.dart';
@@ -19,6 +19,8 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+  bool userinfoChanged = false;
+
   var logger = Logger(printer: SimplePrinter(printTime: true));
   var genderChoices = const ["Mannelijk", "Vrouwelijk", "Zeg ik liever niet"];
   DateTime dob = DateTime(1800);
@@ -27,163 +29,276 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: appbar(context),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                avatar(),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Text(
+                  "Persoonlijke informatie",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: personalInfoForm(context),
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                const Text(
+                  "Speler voorkeuren",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                otherSettingsBtn(
+                    title: "Mijn voorkeuren bewerken",
+                    description:
+                        "Beste hand, kant van de baan, type wedstrijd, beste tijd",
+                    icon: Icons.sports_baseball_outlined),
+                const SizedBox(
+                  height: 40,
+                ),
+                const Text(
+                  "Belangen",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                otherSettingsBtn(
+                    title: "Mijn interesses bewerken",
+                    description:
+                        "Spelen met vrienden, wedstrijden, uitdagingen",
+                    icon: Icons.sports_tennis_outlined),
+                const SizedBox(
+                  height: 40,
+                ),
+                const Text(
+                  "Je wachtwoord",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: changePasswordBtn(),
+                ),
+                const SizedBox(
+                  height: 100,
+                )
+              ],
+            ),
+          ),
+        ));
+  }
+
+  InkWell changePasswordBtn() {
+    return InkWell(
+      onTap: () {},
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              avatar(),
-              const SizedBox(
-                height: 20,
+              Text(
+                "Wachtwoord",
+                style: TextStyle(fontSize: 6),
               ),
-              const Text(
-                "Persoonlijke informatie",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              Text(
+                "••••••••••",
+                style: TextStyle(
+                    letterSpacing: 10,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Column(
+            ],
+          ),
+          Icon(Icons.edit)
+        ],
+      ),
+    );
+  }
+
+// TODO: update user info in database
+  Column personalInfoForm(BuildContext context) {
+    return Column(
+      children: [
+        TextFormField(
+          initialValue: widget.user.name,
+          decoration: const InputDecoration(
+              border: InputBorder.none,
+              label: Text(
+                "Naam en achternaam",
+                style: TextStyle(fontSize: 14),
+              )),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        TextFormField(
+          initialValue: widget.user.email,
+          decoration: const InputDecoration(
+              border: InputBorder.none,
+              label: Text(
+                "E-mail",
+                style: TextStyle(fontSize: 14),
+              )),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        InternationalPhoneNumberInput(
+          inputDecoration: const InputDecoration(
+              border: InputBorder.none,
+              label: Text(
+                "Telefoon",
+                style: TextStyle(fontSize: 14),
+              )),
+          onInputChanged: (number) {},
+          selectorConfig:
+              const SelectorConfig(selectorType: PhoneInputSelectorType.DIALOG),
+          initialValue: PhoneNumber(isoCode: "BE"),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        DropdownButtonFormField(
+            decoration: const InputDecoration(
+                border: InputBorder.none,
+                label: Text(
+                  "Geslacht",
+                  style: TextStyle(fontSize: 14),
+                )),
+            value: genderChoices[0],
+            items: genderChoices.map((String val) {
+              return DropdownMenuItem(
+                value: val,
+                child: Text(
+                  val,
+                ),
+              );
+            }).toList(),
+            onChanged: (item) {}),
+        const SizedBox(
+          height: 16,
+        ),
+        InkWell(
+          onTap: () {
+            selectDate(context);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              (dob == DateTime(1800))
+                  ? const Text("Geboortedatum")
+                  : Column(
+                      children: [
+                        const Text(
+                          "Geboortedatum",
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        Text(
+                            "${dob.day.toString().padLeft(2, '0')}/${dob.month.toString().padLeft(2, '0')}/${dob.year}"),
+                      ],
+                    ),
+              const Icon(Icons.calendar_month_outlined)
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        TextFormField(
+          maxLines: null,
+          maxLength: 160,
+          initialValue: widget.user.bio,
+          decoration: const InputDecoration(
+              border: InputBorder.none,
+              label: Text(
+                "Beschrijving",
+                style: TextStyle(fontSize: 14),
+              )),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        InkWell(
+          onTap: () {
+            selectDate(context);
+          },
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Text("Waar speel je?"), Icon(Icons.explore)],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget otherSettingsBtn(
+      {required String title,
+      required String description,
+      required IconData icon}) {
+    return Container(
+        decoration: BoxDecoration(
+            border: Border.all(width: 2, color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 300,
+                child: Row(
                   children: [
-                    TextFormField(
-                      initialValue: widget.user.name,
-                      decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          label: Text(
-                            "Naam en achternaam",
-                            style: TextStyle(fontSize: 14),
-                          )),
-                    ),
+                    Icon(icon),
                     const SizedBox(
-                      height: 10,
+                      width: 20,
                     ),
-                    TextFormField(
-                      initialValue: widget.user.email,
-                      decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          label: Text(
-                            "E-mail",
-                            style: TextStyle(fontSize: 14),
-                          )),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    InternationalPhoneNumberInput(
-                      inputDecoration: const InputDecoration(
-                          border: InputBorder.none,
-                          label: Text(
-                            "Telefoon",
-                            style: TextStyle(fontSize: 14),
-                          )),
-                      onInputChanged: (number) {},
-                      selectorConfig: const SelectorConfig(
-                          selectorType: PhoneInputSelectorType.DIALOG),
-                      initialValue: PhoneNumber(isoCode: "BE"),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    DropdownButtonFormField(
-                        decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            label: Text(
-                              "Geslacht",
-                              style: TextStyle(fontSize: 14),
-                            )),
-                        value: genderChoices[0],
-                        items: genderChoices.map((String val) {
-                          return DropdownMenuItem(
-                            value: val,
-                            child: Text(
-                              val,
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (item) {}),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        selectDate(context);
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          (dob == DateTime(1800))
-                              ? const Text("Geboortedatum")
-                              : Column(
-                                  children: [
-                                    const Text(
-                                      "Geboortedatum",
-                                      style: TextStyle(fontSize: 10),
-                                    ),
-                                    Text(
-                                        "${dob.day.toString().padLeft(2, '0')}/${dob.month.toString().padLeft(2, '0')}/${dob.year}"),
-                                  ],
-                                ),
-                          const Icon(Icons.calendar_month_outlined)
+                          Text(title,
+                              style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.bold, fontSize: 14)),
+                          Text(
+                            description,
+                            style: GoogleFonts.roboto(fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          )
                         ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextFormField(
-                      maxLines: null,
-                      maxLength: 160,
-                      initialValue: widget.user.bio,
-                      decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          label: Text(
-                            "Beschrijving",
-                            style: TextStyle(fontSize: 14),
-                          )),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        selectDate(context);
-                      },
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [Text("Waar speel je?"), Icon(Icons.explore)],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 40,
-              ),
-              const Text(
-                "Speler voorkeuren",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: SvgPicture.asset(
+                  "images/chevron-forward-outline.svg",
+                  height: 28,
+                  colorFilter:
+                      ColorFilter.mode(Colors.grey.shade800, BlendMode.srcIn),
+                ),
+              )
             ],
           ),
         ));
-  }
-
-  selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != dob || picked != null) {
-      setState(() {
-        dob = picked!;
-      });
-    }
   }
 
   Center avatar() {
@@ -222,6 +337,7 @@ class _EditProfileState extends State<EditProfile> {
 
   AppBar appbar(BuildContext context) {
     return AppBar(
+      scrolledUnderElevation: 0,
       leading: IconButton(
           onPressed: () {
             logger.d("Back button pressed");
@@ -246,5 +362,19 @@ class _EditProfileState extends State<EditProfile> {
             ))
       ],
     );
+  }
+
+  /// Shows a datepicker and changes the date of birth after you've picked a date
+  selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != dob || picked != null) {
+      setState(() {
+        dob = picked!;
+      });
+    }
   }
 }
