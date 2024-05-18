@@ -14,15 +14,7 @@ class AppUser {
   DateTime dateOfBirth = DateTime(0);
   String bio = "";
   String location = "";
-  Map<String, bool> interests = {
-    "community": false,
-    "compete": false,
-    "friends": false,
-    "stats": false,
-    "progression": false,
-    "booking": false,
-    "people": false
-  };
+  Interests interests = Interests();
   String avatarPic = "";
 
   AppUser({required this.email, required this.name, required this.tel});
@@ -36,4 +28,14 @@ class AppUser {
       'preferences': preferences
     };
   }
+}
+
+class Interests {
+  bool community = false,
+      compete = false,
+      friends = false,
+      stats = false,
+      progression = false,
+      booking = false,
+      people = false;
 }

@@ -6,6 +6,7 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/model/user.dart';
 import 'package:playtomic_app/src/pages/profile/edit_preferences.dart';
+import 'package:playtomic_app/src/pages/profile/hamburger_pages/edit_interests.dart';
 
 class EditProfile extends StatefulWidget {
   final AppUser user;
@@ -90,11 +91,24 @@ class _EditProfileState extends State<EditProfile> {
                 const SizedBox(
                   height: 10,
                 ),
-                otherSettingsBtn(
-                    title: "Mijn interesses bewerken",
-                    description:
-                        "Spelen met vrienden, wedstrijden, uitdagingen",
-                    icon: Icons.sports_tennis_outlined),
+                InkWell(
+                  hoverColor: Colors.transparent,
+                  onTap: () {
+                    widget.logger.d("Edit Interests button pressed");
+                    Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                            pageBuilder: (ctx, anim1, anim2) => EditInterests(
+                                  user: widget.user,
+                                ))).then((value) => setState(() {}));
+                    widget.logger.d("Going to EditInterests page");
+                  },
+                  child: otherSettingsBtn(
+                      title: "Mijn interesses bewerken",
+                      description:
+                          "Spelen met vrienden, wedstrijden, uitdagingen",
+                      icon: Icons.sports_tennis_outlined),
+                ),
                 const SizedBox(
                   height: 40,
                 ),

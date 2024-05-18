@@ -23,6 +23,7 @@ dependencies:
   cloud_firestore: ^4.17.2
   flutter_svg: ^2.0.10+1
   logger: ^2.3.0
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
   flutter_test:
@@ -44,3 +45,7 @@ flutter:
     - family: Naville
       fonts:
         - asset: assets/fonts/Naville-Regular.ttf
+    - family: Noto
+      fonts:
+        - asset: assets/fonts/NotoSans.ttf
+        - asset: assets/fonts/NotoSans-Italic.ttf
