@@ -17,13 +17,13 @@ class _ProfileActivitiesState extends State<ProfileActivities> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          ProfilePreferences(preferences: widget.user.preferences),
+          profilePreferences(preferences: widget.user.preferences),
         ],
       ),
     );
   }
 
-  Widget ProfilePreferences({required Map<String, int> preferences}) {
+  Widget profilePreferences({required Map<String, int> preferences}) {
     final hand = ["Rechtshandig", "Linkshandig", "Beide"];
     final position = ["Backhand", "Forehand", "Beide helften"];
     final gameType = ["Concurrerend", "Vriendschappelijk", "Beide"];

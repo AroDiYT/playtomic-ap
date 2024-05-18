@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile/hamburger.dart';
@@ -67,65 +68,55 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             var user = snapshot.data!;
 
             return Scaffold(
-                appBar: AppBar(
-                    scrolledUnderElevation: 0,
-                    toolbarHeight: 80,
-                    centerTitle: true,
-                    title: Text(
-                      'Profile',
-                      style: GoogleFonts.roboto(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    actions: [chatsBtn(context), hamburgerBtn(context, user)]),
-                body: CustomScrollView(
-                  slivers: [
-                    SliverList.list(children: [
-                      Column(
-                        children: [
-                          // Avatar and name:
-                          heading(user.name),
-                          // Wedstrijden, Volgers and Volgend:
-                          stats(),
-                          // Edit Profile and Get Premium:
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [editProfileBtn(), getPremiumBtn()],
-                          ),
-                        ],
-                      ),
-                    ]),
-                    SliverAppBar(
-                      scrolledUnderElevation: 0,
-                      pinned: true,
-                      title: TabBar(
-                          controller: _tabController,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          labelColor: Colors.indigo.shade900,
-                          indicatorColor: Colors.indigo.shade900,
-                          splashFactory: NoSplash.splashFactory,
-                          tabs: myTabs),
-                    ),
-                    SliverList(
-                        delegate: SliverChildListDelegate([
-                      SizedBox(
-                        //Add this to give height
-                        height:
-                            1000, //TODO: Find better solution to make this scrollable
-                        child: DefaultTabController(
-                          length: 2,
-                          child: TabBarView(
-                              controller: _tabController,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: [
-                                ProfileActivities(user: user),
-                                const ProfilePosts(),
-                              ]),
+              appBar: AppBar(
+                  scrolledUnderElevation: 0,
+                  toolbarHeight: 80,
+                  centerTitle: true,
+                  title: Text(
+                    'Profile',
+                    style: GoogleFonts.roboto(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  actions: [chatsBtn(context), hamburgerBtn(context, user)]),
+              body: NestedScrollView(
+                headerSliverBuilder: (ctx, val) => [
+                  SliverList.list(children: [
+                    Column(
+                      children: [
+                        // Avatar and name:
+                        heading(user.name),
+                        // Wedstrijden, Volgers and Volgend:
+                        stats(),
+                        // Edit Profile and Get Premium:
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [editProfileBtn(), getPremiumBtn()],
                         ),
-                      ),
-                    ]))
-                  ],
-                ));
+                      ],
+                    ),
+                  ]),
+                  SliverAppBar(
+                    scrolledUnderElevation: 0,
+                    pinned: true,
+                    title: TabBar(
+                        controller: _tabController,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelColor: Colors.indigo.shade900,
+                        indicatorColor: Colors.indigo.shade900,
+                        splashFactory: NoSplash.splashFactory,
+                        tabs: myTabs),
+                  )
+                ],
+                body: TabBarView(
+                    controller: _tabController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      ProfileActivities(user: user),
+                      const ProfilePosts(),
+                    ]),
+              ),
+            );
           } else {
             return const Text("Loading");
           }
