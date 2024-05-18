@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/profile/hamburger_pages/edit_profile.dart';
-import 'package:playtomic_app/src/user.dart';
+import 'package:playtomic_app/src/model/user.dart';
 import 'package:logger/logger.dart';
 
 class Hamburger extends StatefulWidget {

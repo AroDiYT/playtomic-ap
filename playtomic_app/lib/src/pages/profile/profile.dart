@@ -8,7 +8,7 @@ import 'package:playtomic_app/src/pages/profile/hamburger.dart';
 import 'package:playtomic_app/src/pages/profile/profile_activities.dart';
 import 'package:playtomic_app/src/pages/profile/profile_posts.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
-import 'package:playtomic_app/src/user.dart';
+import 'package:playtomic_app/src/model/user.dart';
 // ignore: unused_import
 
 class Profile extends StatefulWidget {

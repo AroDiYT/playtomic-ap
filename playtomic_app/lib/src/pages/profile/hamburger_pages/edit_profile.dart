@@ -4,7 +4,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:logger/logger.dart';
-import 'package:playtomic_app/src/user.dart';
+import 'package:playtomic_app/src/model/user.dart';
 
 class EditProfile extends StatefulWidget {
   final AppUser user;

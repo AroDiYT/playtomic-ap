@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/pages/profile/edit_preferences.dart';
-import 'package:playtomic_app/src/user.dart';
+import 'package:playtomic_app/src/model/user.dart';
 
 class ProfileActivities extends StatefulWidget {
   final AppUser user;

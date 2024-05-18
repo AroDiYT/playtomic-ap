@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:playtomic_app/src/user.dart';
+import 'package:playtomic_app/src/model/user.dart';
 
 class EditPreferences extends StatefulWidget {
   final AppUser user;
@@ -56,6 +56,8 @@ class _EditPreferencesState extends State<EditPreferences>
         ));
   }
 
+  /// Widget with different selection sections to change your preferences for
+  /// playing padel.
   Widget padel() {
     return Padding(
       padding: const EdgeInsets.all(12),
