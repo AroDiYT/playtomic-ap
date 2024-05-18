@@ -10,6 +10,20 @@ class AppUser {
     "position": -1,
     "type": -1,
   };
+  int gender = -1;
+  DateTime dateOfBirth = DateTime(0);
+  String bio = "";
+  String location = "";
+  Map<String, bool> interests = {
+    "community": false,
+    "compete": false,
+    "friends": false,
+    "stats": false,
+    "progression": false,
+    "booking": false,
+    "people": false
+  };
+  String avatarPic = "";
 
   AppUser({required this.email, required this.name, required this.tel});
 
