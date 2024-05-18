@@ -21,22 +21,29 @@ class _EditPreferencesState extends State<EditPreferences>
   late TabController _tabController;
 
   final List<bool> selectedHand = [false, false, false];
-  final List<String> handTypes = ["Rechtshanding", "Linkshandig", "Beide"];
   final List<bool> selectedPosition = [false, false, false];
-  final List<String> positionTypes = ["Forehand", "Backhand", "Beide helften"];
   final List<bool> selectedMatchType = [false, false, false];
-  final List<String> matchTypes = [
-    "Concurrerend",
-    "Vriendschappelijk",
-    "Beide"
-  ];
   final List<bool> selectedTime = [false, false, false, false];
-  final List<String> timeTypes = ["Ochtend", "Middag", "Avond", "De hele dag"];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: tabTitles.length);
+
+    widget.logger.d(widget.user.preferences);
+
+    if (widget.user.preferences["hand"] != -1) {
+      selectedHand[widget.user.preferences["hand"]!] = true;
+    }
+    if (widget.user.preferences["position"] != -1) {
+      selectedPosition[widget.user.preferences["position"]!] = true;
+    }
+    if (widget.user.preferences["type"] != -1) {
+      selectedMatchType[widget.user.preferences["type"]!] = true;
+    }
+    if (widget.user.preferences["favTime"] != -1) {
+      selectedTime[widget.user.preferences["favTime"]!] = true;
+    }
   }
 
   @override
@@ -59,6 +66,24 @@ class _EditPreferencesState extends State<EditPreferences>
   /// Widget with different selection sections to change your preferences for
   /// playing padel.
   Widget padel() {
+    final List<String> handTypes = ["Rechtshanding", "Linkshandig", "Beide"];
+    final List<String> positionTypes = [
+      "Forehand",
+      "Backhand",
+      "Beide helften"
+    ];
+    final List<String> matchTypes = [
+      "Concurrerend",
+      "Vriendschappelijk",
+      "Beide"
+    ];
+    final List<String> timeTypes = [
+      "Ochtend",
+      "Middag",
+      "Avond",
+      "De hele dag"
+    ];
+
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -110,6 +135,7 @@ class _EditPreferencesState extends State<EditPreferences>
     );
   }
 
+  /// Generates toggle buttons for the items provided in the lists [selection] and [text].
   ToggleButtons toggleButtons(List<bool> selection, List<String> text) {
     return ToggleButtons(
       renderBorder: false,
@@ -156,12 +182,22 @@ class _EditPreferencesState extends State<EditPreferences>
     return const Text("Tennis");
   }
 
+  /// Appbar with a title and a back button.
   AppBar appbar(BuildContext context) {
     return AppBar(
       scrolledUnderElevation: 0,
       leading: IconButton(
           onPressed: () {
             widget.logger.d("Back button pressed");
+
+            widget.user.preferences["hand"] = selectedHand.indexOf(true);
+            widget.user.preferences["position"] =
+                selectedPosition.indexOf(true);
+            widget.user.preferences["type"] = selectedMatchType.indexOf(true);
+            widget.user.preferences["favTime"] = selectedTime.indexOf(true);
+            widget.logger.d("Updated user preferences");
+            widget.logger.d(widget.user.preferences);
+
             Navigator.pop(context);
             widget.logger.d("Go back");
           },

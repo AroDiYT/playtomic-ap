@@ -16,6 +16,8 @@ class ProfileActivities extends StatefulWidget {
 class _ProfileActivitiesState extends State<ProfileActivities> {
   @override
   Widget build(BuildContext context) {
+    widget.logger.d(widget.user.preferences);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -51,7 +53,7 @@ class _ProfileActivitiesState extends State<ProfileActivities> {
                       PageRouteBuilder(
                           pageBuilder: (ctx, anim1, anim2) => EditPreferences(
                                 user: widget.user,
-                              )));
+                              ))).then((value) => setState(() {}));
                   widget.logger.d("Going to EditPreferences page");
                 },
                 child: Text(
@@ -76,7 +78,7 @@ class _ProfileActivitiesState extends State<ProfileActivities> {
           height: 10,
         ),
         preference(
-            preferences["time"], time, "🌄", "Favoriete tijd om te spelen"),
+            preferences["favTime"], time, "🌄", "Favoriete tijd om te spelen"),
       ],
     );
   }
@@ -102,14 +104,35 @@ class _ProfileActivitiesState extends State<ProfileActivities> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(preferenceTitle),
-                const SizedBox(
-                  height: 5,
+                Text(
+                  preferenceTitle,
+                  style: const TextStyle(fontSize: 12),
                 ),
                 if (choice != -1 && choice != null)
                   Text(choices[choice])
                 else
-                  const Text("Onbekend")
+                  TextButton(
+                      style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          foregroundColor: Colors.grey.shade100),
+                      onPressed: () {
+                        widget.logger.d("Edit button pressed");
+                        Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (ctx, anim1, anim2) =>
+                                    EditPreferences(
+                                      user: widget.user,
+                                    ))).then((value) => setState(() {}));
+                        widget.logger.d("Going to EditPreferences page");
+                      },
+                      child: Text(
+                        "Niet beschreven",
+                        style: TextStyle(
+                            color: Colors.blue.shade800,
+                            fontWeight: FontWeight.bold),
+                      ))
               ],
             )
           ],

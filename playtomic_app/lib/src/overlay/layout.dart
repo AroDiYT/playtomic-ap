@@ -23,7 +23,7 @@ class _LayoutState extends State<Layout> {
     const Play(),
     const Discover(),
     const Community(),
-    const Profile()
+    Profile()
   ];
 
   @override

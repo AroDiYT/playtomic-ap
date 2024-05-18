@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/pages/profile/hamburger.dart';
 import 'package:playtomic_app/src/pages/profile/profile_activities.dart';
 import 'package:playtomic_app/src/pages/profile/profile_posts.dart';
@@ -12,7 +12,8 @@ import 'package:playtomic_app/src/model/user.dart';
 // ignore: unused_import
 
 class Profile extends StatefulWidget {
-  const Profile({super.key});
+  Profile({super.key});
+  final Logger logger = Logger(printer: SimplePrinter(printTime: true));
 
   @override
   // ignore: library_private_types_in_public_api
