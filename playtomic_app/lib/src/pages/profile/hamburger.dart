@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:playtomic_app/src/pages/profile/hamburger_pages/edit_profile.dart';
 import 'package:playtomic_app/src/user.dart';
+import 'package:logger/logger.dart';
 
 class Hamburger extends StatefulWidget {
   final AppUser user;
@@ -15,13 +18,19 @@ class Hamburger extends StatefulWidget {
 }
 
 class _HamburgerState extends State<Hamburger> {
+  var logger = Logger(
+    printer: SimplePrinter(printTime: true),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
+              logger.d("Back button pressed");
               Navigator.pop(context);
+              logger.d("Go back");
             },
             icon: const Icon(Icons.close)),
         backgroundColor: Colors.grey.shade100,
@@ -77,11 +86,23 @@ class _HamburgerState extends State<Hamburger> {
                 color: Colors.white,
                 child: Column(
                   children: [
-                    settingsCategory(
-                        title: "Profiel bewerken",
-                        description:
-                            "Bewerk naam, e-mail, telefoonnummer, locatie,...",
-                        icon: Icons.person_outline),
+                    InkWell(
+                      onTap: () {
+                        logger.d("Edit Profile button pressed");
+                        Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (ctx, __, ___) => EditProfile(
+                                      user: widget.user,
+                                    )));
+                        logger.d("Going to Edit Profile page");
+                      },
+                      child: settingsCategory(
+                          title: "Profiel bewerken",
+                          description:
+                              "Bewerk naam, e-mail, telefoonnummer, locatie,...",
+                          icon: Icons.person_outline),
+                    ),
                     settingsCategory(
                         title: "Mijn activiteit",
                         description:
@@ -235,8 +256,11 @@ class _HamburgerState extends State<Hamburger> {
       highlightElevation: 0,
       type: GFButtonType.transparent,
       onPressed: () {
+        logger.d("signOutBtn clicked");
         FirebaseAuth.instance.signOut();
+        logger.d("Signed out of FireBase");
         Navigator.pop(context);
+        logger.d("Go back to main page");
       },
       child: const Row(
         children: [
