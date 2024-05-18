@@ -17,17 +17,9 @@ class EditInterests extends StatefulWidget {
 }
 
 class _EditInterestsState extends State<EditInterests> {
-  final List<bool> selection = List.generate(7, (index) => false);
+  List<bool> selection = List.generate(7, (index) => false);
 
-  final List<String> interests = [
-    "Ontdek de gemeenschap",
-    "Concurreren met anderen",
-    "Speel met vrienden",
-    "Mijn speelniveau kennen",
-    "Mijn vooruitgang bijhouden",
-    "Reserveer een baan",
-    "Zoek mensen om mee te spelen"
-  ];
+  List<String> interests = [];
   final List<Widget> interestIcons = [
     const ImageIcon(
       AssetImage("images/PT_logo.png"),
@@ -39,6 +31,13 @@ class _EditInterestsState extends State<EditInterests> {
     const Icon(FontAwesomeIcons.magnifyingGlass),
     const Icon(FontAwesomeIcons.peopleGroup),
   ];
+
+  @override
+  initState() {
+    super.initState();
+    selection = widget.user.interests.values.toList();
+    interests = widget.user.interests.keys.toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +128,15 @@ class _EditInterestsState extends State<EditInterests> {
                 fullWidthButton: true,
                 shape: GFButtonShape.pills,
                 color: Colors.blue,
-                onPressed: () {},
+                onPressed: () {
+                  widget.logger.d("Save button pressed");
+                  for (int i = 0; i < 7; i++) {
+                    widget.user.interests[interests[i]] = selection[i];
+                  }
+                  widget.logger.d("Interests saved in User");
+                  Navigator.pop(context);
+                  widget.logger.d("Going back to Edit Profile");
+                },
                 child: const Text(
                   "Opslaan",
                   style: TextStyle(color: Colors.white, fontSize: 16),
