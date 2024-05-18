@@ -3,15 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/pages/profile/hamburger.dart';
 import 'package:playtomic_app/src/pages/profile/profile_activities.dart';
 import 'package:playtomic_app/src/pages/profile/profile_posts.dart';
 import 'package:playtomic_app/src/settings/settings_view.dart';
-import 'package:playtomic_app/src/user.dart';
+import 'package:playtomic_app/src/model/user.dart';
 // ignore: unused_import
 
 class Profile extends StatefulWidget {
-  const Profile({super.key});
+  Profile({super.key});
+  final Logger logger = Logger(printer: SimplePrinter(printTime: true));
 
   @override
   // ignore: library_private_types_in_public_api
@@ -67,38 +69,44 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             var user = snapshot.data!;
 
             return Scaffold(
-                appBar: AppBar(
-                    scrolledUnderElevation: 0,
-                    toolbarHeight: 80,
-                    centerTitle: true,
-                    title: Text(
-                      'Profile',
-                      style: GoogleFonts.roboto(
-                          fontSize: 16, fontWeight: FontWeight.bold),
+              appBar: AppBar(
+                  scrolledUnderElevation: 0,
+                  toolbarHeight: 50,
+                  centerTitle: true,
+                  title: Text(
+                    'Profile',
+                    style: GoogleFonts.roboto(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  actions: [chatsBtn(context), hamburgerBtn(context, user)]),
+              body: NestedScrollView(
+                headerSliverBuilder: (ctx, val) => [
+                  SliverList.list(children: [
+                    Column(
+                      children: [
+                        // Avatar and name:
+                        heading(user.name),
+                        // Wedstrijden, Volgers and Volgend:
+                        stats(),
+                        // Edit Profile and Get Premium:
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [editProfileBtn(), getPremiumBtn()],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      ],
                     ),
-                    actions: [chatsBtn(context), hamburgerBtn(context, user)]),
-                body: CustomScrollView(
-                  slivers: [
-                    SliverList.list(children: [
-                      Column(
-                        children: [
-                          // Avatar and name:
-                          heading(user.name),
-                          // Wedstrijden, Volgers and Volgend:
-                          stats(),
-                          // Edit Profile and Get Premium:
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [editProfileBtn(), getPremiumBtn()],
-                          ),
-                        ],
-                      ),
-                    ]),
-                    SliverAppBar(
-                      scrolledUnderElevation: 0,
-                      pinned: true,
-                      title: TabBar(
+                  ]),
+                  SliverAppBar(
+                    scrolledUnderElevation: 0,
+                    pinned: true,
+                    toolbarHeight: 30,
+                    title: SizedBox(
+                      height: 30,
+                      child: TabBar(
                           controller: _tabController,
                           indicatorSize: TabBarIndicatorSize.tab,
                           labelColor: Colors.indigo.shade900,
@@ -106,26 +114,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           splashFactory: NoSplash.splashFactory,
                           tabs: myTabs),
                     ),
-                    SliverList(
-                        delegate: SliverChildListDelegate([
-                      SizedBox(
-                        //Add this to give height
-                        height:
-                            1000, //TODO: Find better solution to make this scrollable
-                        child: DefaultTabController(
-                          length: 2,
-                          child: TabBarView(
-                              controller: _tabController,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: [
-                                ProfileActivities(user: user),
-                                const ProfilePosts(),
-                              ]),
-                        ),
-                      ),
-                    ]))
-                  ],
-                ));
+                  )
+                ],
+                body: TabBarView(controller: _tabController, children: [
+                  ProfileActivities(user: user),
+                  const ProfilePosts(),
+                ]),
+              ),
+            );
           } else {
             return const Text("Loading");
           }

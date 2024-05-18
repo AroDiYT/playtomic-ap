@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:playtomic_app/src/user.dart';
+import 'package:logger/logger.dart';
+import 'package:playtomic_app/src/pages/profile/edit_preferences.dart';
+import 'package:playtomic_app/src/model/user.dart';
 
 class ProfileActivities extends StatefulWidget {
   final AppUser user;
+  final Logger logger = Logger(printer: SimplePrinter(printTime: true));
 
-  const ProfileActivities({super.key, required this.user});
+  ProfileActivities({super.key, required this.user});
 
   @override
   _ProfileActivitiesState createState() => _ProfileActivitiesState();
@@ -13,17 +16,19 @@ class ProfileActivities extends StatefulWidget {
 class _ProfileActivitiesState extends State<ProfileActivities> {
   @override
   Widget build(BuildContext context) {
+    widget.logger.d(widget.user.preferences);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          ProfilePreferences(preferences: widget.user.preferences),
+          profilePreferences(preferences: widget.user.preferences),
         ],
       ),
     );
   }
 
-  Widget ProfilePreferences({required Map<String, int> preferences}) {
+  Widget profilePreferences({required Map<String, int> preferences}) {
     final hand = ["Rechtshandig", "Linkshandig", "Beide"];
     final position = ["Backhand", "Forehand", "Beide helften"];
     final gameType = ["Concurrerend", "Vriendschappelijk", "Beide"];
@@ -40,160 +45,99 @@ class _ProfileActivitiesState extends State<ProfileActivities> {
                 "Preferences",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                "Edit",
-                style: TextStyle(
-                    color: Colors.blue.shade800, fontWeight: FontWeight.bold),
+              TextButton(
+                onPressed: () {
+                  widget.logger.d("Edit button pressed");
+                  Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                          pageBuilder: (ctx, anim1, anim2) => EditPreferences(
+                                user: widget.user,
+                              ))).then((value) => setState(() {}));
+                  widget.logger.d("Going to EditPreferences page");
+                },
+                child: Text(
+                  "Edit",
+                  style: TextStyle(
+                      color: Colors.blue.shade800, fontWeight: FontWeight.bold),
+                ),
               )
             ],
           ),
         ),
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.grey),
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                const Text(
-                  "👋",
-                  style: TextStyle(fontSize: 18),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Beste hand"),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    if (preferences["hand"] != -1 &&
-                        preferences["hand"] != null)
-                      Text(hand[preferences["hand"]!])
-                    else
-                      const Text("Onbekend")
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
+        preference(preferences['hand'], hand, "👋", "Beste hand"),
         const SizedBox(
           height: 10,
         ),
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.grey),
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                const Text(
-                  "📍",
-                  style: TextStyle(fontSize: 18),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Baanpositie"),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    if (preferences["position"] != -1 &&
-                        preferences["position"] != null)
-                      Text(position[preferences["position"]!])
-                    else
-                      const Text("Onbekend")
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
+        preference(preferences["position"], position, "📍", "Baanpositie"),
         const SizedBox(
           height: 10,
         ),
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.grey),
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                const Text(
-                  "🥇",
-                  style: TextStyle(fontSize: 18),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Type partij"),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    if (preferences["type"] != -1 &&
-                        preferences["type"] != null)
-                      Text(gameType[preferences["type"]!])
-                    else
-                      const Text("Onbekend")
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
+        preference(preferences["type"], gameType, "🥇", "Type partij"),
         const SizedBox(
           height: 10,
         ),
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.grey),
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                const Text(
-                  "🌄",
-                  style: TextStyle(fontSize: 18),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Favoriete tijd om te spelen"),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    if (preferences["time"] != -1 &&
-                        preferences["time"] != null)
-                      Text(time[preferences["time"]!])
-                    else
-                      const Text("Onbekend")
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
+        preference(
+            preferences["favTime"], time, "🌄", "Favoriete tijd om te spelen"),
       ],
+    );
+  }
+
+  Widget preference(
+      int? choice, List<String> choices, String emoji, String preferenceTitle) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(width: 1, color: Colors.grey),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Text(
+              emoji,
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  preferenceTitle,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                if (choice != -1 && choice != null)
+                  Text(choices[choice])
+                else
+                  TextButton(
+                      style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          foregroundColor: Colors.grey.shade100),
+                      onPressed: () {
+                        widget.logger.d("Edit button pressed");
+                        Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                                pageBuilder: (ctx, anim1, anim2) =>
+                                    EditPreferences(
+                                      user: widget.user,
+                                    ))).then((value) => setState(() {}));
+                        widget.logger.d("Going to EditPreferences page");
+                      },
+                      child: Text(
+                        "Niet beschreven",
+                        style: TextStyle(
+                            color: Colors.blue.shade800,
+                            fontWeight: FontWeight.bold),
+                      ))
+              ],
+            )
+          ],
+        ),
+      ),
     );
   }
 }

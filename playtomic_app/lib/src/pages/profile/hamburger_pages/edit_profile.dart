@@ -4,12 +4,15 @@ import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:logger/logger.dart';
-import 'package:playtomic_app/src/user.dart';
+import 'package:playtomic_app/src/model/user.dart';
+import 'package:playtomic_app/src/pages/profile/edit_preferences.dart';
+import 'package:playtomic_app/src/pages/profile/hamburger_pages/edit_interests.dart';
 
 class EditProfile extends StatefulWidget {
   final AppUser user;
+  final Logger logger = Logger(printer: SimplePrinter(printTime: true));
 
-  const EditProfile({
+  EditProfile({
     super.key,
     required this.user,
   });
@@ -60,11 +63,24 @@ class _EditProfileState extends State<EditProfile> {
                 const SizedBox(
                   height: 10,
                 ),
-                otherSettingsBtn(
-                    title: "Mijn voorkeuren bewerken",
-                    description:
-                        "Beste hand, kant van de baan, type wedstrijd, beste tijd",
-                    icon: Icons.sports_baseball_outlined),
+                InkWell(
+                  hoverColor: Colors.transparent,
+                  onTap: () {
+                    widget.logger.d("Edit Preferences button pressed");
+                    Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                            pageBuilder: (ctx, anim1, anim2) => EditPreferences(
+                                  user: widget.user,
+                                ))).then((value) => setState(() {}));
+                    widget.logger.d("Going to EditPreferences page");
+                  },
+                  child: otherSettingsBtn(
+                      title: "Mijn voorkeuren bewerken",
+                      description:
+                          "Beste hand, kant van de baan, type wedstrijd, beste tijd",
+                      icon: Icons.sports_baseball_outlined),
+                ),
                 const SizedBox(
                   height: 40,
                 ),
@@ -75,11 +91,24 @@ class _EditProfileState extends State<EditProfile> {
                 const SizedBox(
                   height: 10,
                 ),
-                otherSettingsBtn(
-                    title: "Mijn interesses bewerken",
-                    description:
-                        "Spelen met vrienden, wedstrijden, uitdagingen",
-                    icon: Icons.sports_tennis_outlined),
+                InkWell(
+                  hoverColor: Colors.transparent,
+                  onTap: () {
+                    widget.logger.d("Edit Interests button pressed");
+                    Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                            pageBuilder: (ctx, anim1, anim2) => EditInterests(
+                                  user: widget.user,
+                                ))).then((value) => setState(() {}));
+                    widget.logger.d("Going to EditInterests page");
+                  },
+                  child: otherSettingsBtn(
+                      title: "Mijn interesses bewerken",
+                      description:
+                          "Spelen met vrienden, wedstrijden, uitdagingen",
+                      icon: Icons.sports_tennis_outlined),
+                ),
                 const SizedBox(
                   height: 40,
                 ),
