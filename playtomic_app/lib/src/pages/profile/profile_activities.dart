@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:playtomic_app/src/pages/profile/edit_preferences.dart';
 import 'package:playtomic_app/src/user.dart';
 
 class ProfileActivities extends StatefulWidget {
   final AppUser user;
+  final Logger logger = Logger(printer: SimplePrinter(printTime: true));
 
-  const ProfileActivities({super.key, required this.user});
+  ProfileActivities({super.key, required this.user});
 
   @override
   _ProfileActivitiesState createState() => _ProfileActivitiesState();
@@ -40,10 +43,22 @@ class _ProfileActivitiesState extends State<ProfileActivities> {
                 "Preferences",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                "Edit",
-                style: TextStyle(
-                    color: Colors.blue.shade800, fontWeight: FontWeight.bold),
+              TextButton(
+                onPressed: () {
+                  widget.logger.d("Edit button pressed");
+                  Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                          pageBuilder: (ctx, anim1, anim2) => EditPreferences(
+                                user: widget.user,
+                              )));
+                  widget.logger.d("Going to EditPreferences page");
+                },
+                child: Text(
+                  "Edit",
+                  style: TextStyle(
+                      color: Colors.blue.shade800, fontWeight: FontWeight.bold),
+                ),
               )
             ],
           ),
@@ -66,7 +81,7 @@ class _ProfileActivitiesState extends State<ProfileActivities> {
     );
   }
 
-  Container preference(
+  Widget preference(
       int? choice, List<String> choices, String emoji, String preferenceTitle) {
     return Container(
       decoration: BoxDecoration(

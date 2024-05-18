@@ -70,7 +70,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             return Scaffold(
               appBar: AppBar(
                   scrolledUnderElevation: 0,
-                  toolbarHeight: 80,
+                  toolbarHeight: 50,
                   centerTitle: true,
                   title: Text(
                     'Profile',
@@ -93,28 +93,32 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           mainAxisSize: MainAxisSize.max,
                           children: [editProfileBtn(), getPremiumBtn()],
                         ),
+                        const SizedBox(
+                          height: 20,
+                        ),
                       ],
                     ),
                   ]),
                   SliverAppBar(
                     scrolledUnderElevation: 0,
                     pinned: true,
-                    title: TabBar(
-                        controller: _tabController,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: Colors.indigo.shade900,
-                        indicatorColor: Colors.indigo.shade900,
-                        splashFactory: NoSplash.splashFactory,
-                        tabs: myTabs),
+                    toolbarHeight: 30,
+                    title: SizedBox(
+                      height: 30,
+                      child: TabBar(
+                          controller: _tabController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          labelColor: Colors.indigo.shade900,
+                          indicatorColor: Colors.indigo.shade900,
+                          splashFactory: NoSplash.splashFactory,
+                          tabs: myTabs),
+                    ),
                   )
                 ],
-                body: TabBarView(
-                    controller: _tabController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      ProfileActivities(user: user),
-                      const ProfilePosts(),
-                    ]),
+                body: TabBarView(controller: _tabController, children: [
+                  ProfileActivities(user: user),
+                  const ProfilePosts(),
+                ]),
               ),
             );
           } else {
