@@ -147,7 +147,7 @@ class _RegisterState extends State<Register> {
                     InternationalPhoneNumberInput(
                         textFieldController: _telController,
                         hintText: "470888888",
-                        initialValue: PhoneNumber(isoCode: "32"),
+                        initialValue: PhoneNumber(isoCode: "BE"),
                         selectorConfig: const SelectorConfig(
                             //showFlags: false
                             ),
