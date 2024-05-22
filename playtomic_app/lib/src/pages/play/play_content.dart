@@ -4,6 +4,7 @@ import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/shape/gf_button_shape.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:playtomic_app/src/pages/play/club_card.dart';
+import 'package:playtomic_app/src/pages/play/club_search.dart';
 import 'package:playtomic_app/src/pages/play/play_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -201,21 +202,27 @@ class _PlayContentState extends State<PlayContent> {
                 const SizedBox(
                   height: 10,
                 ),
-                const Column(
+                Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                            child: PlayCard(
-                                title: "Een baan zoeken",
-                                icon: Icons.search_outlined,
-                                description: "Als je al weet met wie je speelt",
-                                imagePath: "images/loginimage_9-16.jpg")),
-                        SizedBox(
+                            child: InkWell(
+                          onTap: () => Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                  pageBuilder: (ctx, _, __) => ClubSearch())),
+                          child: const PlayCard(
+                              title: "Een baan boeken",
+                              icon: Icons.search_outlined,
+                              description: "Als je al weet met wie je speelt",
+                              imagePath: "images/loginimage_9-16.jpg"),
+                        )),
+                        const SizedBox(
                           width: 10,
                         ),
-                        Expanded(
+                        const Expanded(
                           child: PlayCard(
                             title: "Speel een wedstrijd",
                             icon: Icons.sports_tennis_outlined,
@@ -226,10 +233,10 @@ class _PlayContentState extends State<PlayContent> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
@@ -393,12 +400,7 @@ class _PlayContentState extends State<PlayContent> {
                                             width: 2,
                                             color: Colors.grey.shade300),
                                         borderRadius: BorderRadius.circular(20),
-                                        color: Colors.grey.shade900
-                                        // image: const DecorationImage(
-                                        //     image: NetworkImage(
-                                        //         "https://padelmagazine.fr/wp-content/uploads/2024/02/lamperti-2024.jpg.webp"),
-                                        //     fit: BoxFit.cover)
-                                        ),
+                                        color: Colors.grey.shade900),
                                     child: Text(
                                       "Doe mee aan een wedstrijd met anderen",
                                       style: GoogleFonts.roboto(
