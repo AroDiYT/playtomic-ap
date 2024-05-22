@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
+import 'package:playtomic_app/src/model/club.dart';
 import 'package:playtomic_app/src/model/user.dart';
 
 class Database {
@@ -61,5 +62,18 @@ class Database {
       auth_db.currentUser!.reauthenticateWithCredential(credential);
       firestore_db.collection('users').doc(auth_db.currentUser!.email).delete();
     } catch (e) {}
+  }
+
+  Future<List<Club>> getClubs() async {
+    var clubsSnapshot = await firestore_db.collection("clubs").get();
+    var clubs = clubsSnapshot.docs.map((clubDocument) {
+      var clubData = clubDocument.data();
+      return Club(
+          name: clubData["name"],
+          image: clubData["image"],
+          location: clubData["location"]);
+    }).toList();
+
+    return clubs;
   }
 }
