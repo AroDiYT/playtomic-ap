@@ -7,6 +7,7 @@ import 'package:getwidget/shape/gf_button_shape.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/pages/play/club_page.dart';
 
 class ClubSearch extends StatefulWidget {
   var logger = Logger(printer: SimplePrinter(colors: true));
@@ -91,8 +92,16 @@ class _ClubSearchState extends State<ClubSearch> {
               ),
               SliverList.builder(
                 itemCount: clubs.length,
-                itemBuilder: (ctx, i) =>
-                    clubs.map((club) => clubCard(club)).toList()[i],
+                itemBuilder: (ctx, i) => clubs
+                    .map((club) => InkWell(
+                        onTap: () =>
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (context, _, __) => ClubPage(
+                                      club: club,
+                                      logger: widget.logger,
+                                    ))),
+                        child: clubCard(club)))
+                    .toList()[i],
               )
             ]);
           }

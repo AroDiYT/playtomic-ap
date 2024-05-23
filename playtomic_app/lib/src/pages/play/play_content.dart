@@ -3,7 +3,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/shape/gf_button_shape.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:logger/logger.dart';
+import 'package:playtomic_app/src/model/club.dart';
 import 'package:playtomic_app/src/pages/play/club_card.dart';
+import 'package:playtomic_app/src/pages/play/club_page.dart';
 import 'package:playtomic_app/src/pages/play/club_search.dart';
 import 'package:playtomic_app/src/pages/play/play_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -337,10 +340,31 @@ class _PlayContentState extends State<PlayContent> {
                                   .map((DocumentSnapshot document) {
                                 Map<String, dynamic> clubData =
                                     document.data()! as Map<String, dynamic>;
-                                return ClubCard(
-                                    title: clubData["name"],
-                                    image: NetworkImage(clubData["image"]),
-                                    location: clubData["location"]["city"]);
+                                return InkWell(
+                                  onTap: () => Navigator.of(context)
+                                      .push(PageRouteBuilder(
+                                          pageBuilder: (ctx, _, __) => ClubPage(
+                                                club: Club(
+                                                    name: clubData["name"],
+                                                    image: clubData["image"],
+                                                    location: {
+                                                      "street":
+                                                          clubData["location"]
+                                                              ["street"],
+                                                      "nr": clubData["location"]
+                                                          ["nr"],
+                                                      "city":
+                                                          clubData["location"]
+                                                              ["city"],
+                                                    }),
+                                                logger: Logger(
+                                                    printer: SimplePrinter()),
+                                              ))),
+                                  child: ClubCard(
+                                      title: clubData["name"],
+                                      image: NetworkImage(clubData["image"]),
+                                      location: clubData["location"]["city"]),
+                                );
                               }).toList();
                         }
 
