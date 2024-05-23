@@ -148,15 +148,17 @@ class _BookingState extends State<Booking> {
                 child: InkWell(
                   hoverColor: Colors.transparent,
                   splashColor: Colors.transparent,
-                  onTap: () {
-                    if (slot != 0) {
-                      setState(() {
-                        selectedTime = slot;
-                        widget.logger.d(
-                            "Selected: ${(slot / 60).floor().toString().padLeft(2, '0')}:${(slot % 60).toString().padLeft(2, '0')} ($slot)");
-                      });
-                    }
-                  },
+                  onTap: (slot != 0)
+                      ? () {
+                          if (slot != 0) {
+                            setState(() {
+                              selectedTime = slot;
+                              widget.logger.d(
+                                  "Selected: ${(slot / 60).floor().toString().padLeft(2, '0')}:${(slot % 60).toString().padLeft(2, '0')} ($slot)");
+                            });
+                          }
+                        }
+                      : null,
                   child: Container(
                     margin:
                         const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
@@ -166,7 +168,7 @@ class _BookingState extends State<Booking> {
                       color: (selectedTime != slot)
                           ? (slot != 0)
                               ? Colors.white
-                              : Colors.red
+                              : Colors.grey
                           : const Color.fromARGB(255, 0, 20, 20),
                     ),
                     child: Center(
