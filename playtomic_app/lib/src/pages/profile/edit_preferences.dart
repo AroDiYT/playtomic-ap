@@ -190,11 +190,15 @@ class _EditPreferencesState extends State<EditPreferences>
           onPressed: () {
             widget.logger.d("Back button pressed");
 
-            widget.user.preferences["hand"] = selectedHand.indexOf(true);
-            widget.user.preferences["position"] =
-                selectedPosition.indexOf(true);
-            widget.user.preferences["type"] = selectedMatchType.indexOf(true);
-            widget.user.preferences["favTime"] = selectedTime.indexOf(true);
+            var prefs = Map<String, int>.from({
+              "hand": selectedHand.indexOf(true),
+              "position": selectedPosition.indexOf(true),
+              "type": selectedMatchType.indexOf(true),
+              "favTime": selectedTime.indexOf(true)
+            });
+
+            widget.user.preferences = prefs;
+
             widget.logger.d("Updated user preferences");
             widget.logger.d(widget.user.preferences);
 
