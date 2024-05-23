@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:logger/logger.dart';
+import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/club.dart';
 import 'package:playtomic_app/src/model/user.dart';
 
@@ -8,6 +9,7 @@ class Booking extends StatefulWidget {
   Logger logger;
   Club club;
   AppUser user;
+  late Database db = Database(logger);
 
   Booking(
       {super.key,
@@ -23,37 +25,44 @@ class _BookingState extends State<Booking> {
   var pickedDate = DateTime.now();
   var selectedTime = 480;
   List<DateTime> dates = List.empty(growable: true);
-  List<int> timeslots = List.empty(growable: true);
+  late Future<List<int>> timeslots;
 
   @override
   void initState() {
     for (int i = 0; i < 60; i++) {
       dates.add(DateTime.now().add(Duration(days: i)));
     }
-    refreshTimeslots();
+    timeslots = refreshTimeslots();
     super.initState();
   }
 
   /// Gets the matches that have been booked for the day the user selected,
   /// and makes the corresponding timeslots unavailable;
-  refreshTimeslots() {
+  Future<List<int>> refreshTimeslots() async {
     widget.logger.d("Refreshing timeslots");
 
-    timeslots = List.empty(growable: true);
-    for (int i = 0; i < 30; i++) {
-      timeslots.add(480 + i * 30);
-    }
-
-    var pickedDateMatches =
-        widget.club.matches.where((match) => match.date.day == pickedDate.day);
-    if (pickedDateMatches.isNotEmpty) {
-      for (PadelMatch match in pickedDateMatches) {
-        int start =
-            (((match.date.hour * 60 + match.date.minute) - 480) / 30).floor();
-        int end = start + ((match.duration / 30).floor());
-        timeslots.setRange(start, end, List.filled(end, 0));
+    var slots = List<int>.empty(growable: true);
+    return await widget.db
+        .getMatchesByDate(widget.club.id, pickedDate)
+        .then((taken) {
+      for (int i = 0; i < 30; i++) {
+        slots.add(480 + i * 30);
       }
-    }
+
+      if (taken.isNotEmpty) {
+        widget.logger.d("Checking retrieved matches");
+        for (PadelMatch match in taken) {
+          int start =
+              (((match.date.hour * 60 + match.date.minute) - 480) / 30).floor();
+          int end = start + ((match.duration / 30).floor());
+          slots.setRange(start, end, List.filled(end, 0));
+        }
+      }
+
+      widget.logger.d(taken);
+
+      return slots;
+    });
   }
 
   @override
@@ -81,21 +90,36 @@ class _BookingState extends State<Booking> {
                 ],
               ),
             ),
-            timePicker(context),
+            FutureBuilder(
+                future: timeslots,
+                builder: (ctx, snap) {
+                  if (snap.hasData) {
+                    return timePicker(ctx, snap.data!);
+                  } else {
+                    return const CircularProgressIndicator(
+                      color: Color.fromARGB(255, 0, 20, 20),
+                    );
+                  }
+                }),
             Container(
               padding: const EdgeInsets.all(20),
               child: GFButton(
                 onPressed: () => setState(() {
-                  widget.club.matches.add(PadelMatch(
+                  var match = PadelMatch(
                       date: DateTime(
                           pickedDate.year,
                           pickedDate.month,
                           pickedDate.day,
                           (selectedTime / 60).floor(),
                           selectedTime % 60),
-                      owner: widget.user));
-                  refreshTimeslots();
+                      owner: widget.user);
+                  widget.club.matches.add(match);
+
+                  setState(() {
+                    timeslots = refreshTimeslots();
+                  });
                   widget.logger.d(widget.club.matches.toString());
+                  widget.db.createMatch(widget.club, match);
                 }),
                 color: const Color.fromARGB(255, 0, 20, 20),
                 fullWidthButton: true,
@@ -111,7 +135,7 @@ class _BookingState extends State<Booking> {
     );
   }
 
-  SizedBox timePicker(BuildContext context) {
+  SizedBox timePicker(BuildContext context, List<int> timeslots) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: 350,
@@ -178,7 +202,10 @@ class _BookingState extends State<Booking> {
                 pickedDate = dates[i];
                 widget.logger.d("Picked date: ${dates[i]}");
                 selectedTime = 480;
-                refreshTimeslots();
+
+                setState(() {
+                  timeslots = refreshTimeslots();
+                });
               }),
               child: Container(
                 margin: const EdgeInsets.all(6),
