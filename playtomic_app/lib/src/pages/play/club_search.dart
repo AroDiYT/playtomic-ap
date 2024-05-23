@@ -1,19 +1,17 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/getwidget.dart';
-import 'package:getwidget/shape/gf_button_shape.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/model/user.dart';
 import 'package:playtomic_app/src/pages/play/club_page.dart';
 
 class ClubSearch extends StatefulWidget {
   var logger = Logger(printer: SimplePrinter(colors: true));
   late Database db;
+  AppUser user;
 
-  ClubSearch({super.key}) {
+  ClubSearch({super.key, required this.user}) {
     db = Database(logger);
   }
 
@@ -98,6 +96,7 @@ class _ClubSearchState extends State<ClubSearch> {
                             Navigator.of(context).push(PageRouteBuilder(
                                 pageBuilder: (context, _, __) => ClubPage(
                                       club: club,
+                                      user: widget.user,
                                       logger: widget.logger,
                                     ))),
                         child: clubCard(club)))

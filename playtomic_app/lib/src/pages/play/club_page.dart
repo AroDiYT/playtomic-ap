@@ -2,13 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/model/user.dart';
 import 'package:playtomic_app/src/pages/play/booking.dart';
 
 class ClubPage extends StatefulWidget {
   Club club;
+  AppUser user;
   Logger logger;
 
-  ClubPage({super.key, required this.club, required this.logger});
+  ClubPage(
+      {super.key,
+      required this.club,
+      required this.user,
+      required this.logger});
 
   @override
   _ClubPageState createState() => _ClubPageState();
@@ -32,6 +38,8 @@ class _ClubPageState extends State<ClubPage>
       const Text("Home", style: TextStyle(fontSize: 16)),
       Booking(
         logger: widget.logger,
+        club: widget.club,
+        user: widget.user,
       ),
       const Text("Competities", style: TextStyle(fontSize: 16))
     ];

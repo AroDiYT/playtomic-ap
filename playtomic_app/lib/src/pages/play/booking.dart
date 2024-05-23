@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:getwidget/components/button/gf_button.dart';
 import 'package:logger/logger.dart';
+import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/model/user.dart';
 
 class Booking extends StatefulWidget {
   Logger logger;
+  Club club;
+  AppUser user;
 
-  Booking({super.key, required this.logger});
+  Booking(
+      {super.key,
+      required this.logger,
+      required this.club,
+      required this.user});
 
   @override
   _BookingState createState() => _BookingState();
@@ -12,16 +21,39 @@ class Booking extends StatefulWidget {
 
 class _BookingState extends State<Booking> {
   var pickedDate = DateTime.now();
-  late List<DateTime> dates;
+  var selectedTime = 480;
+  List<DateTime> dates = List.empty(growable: true);
+  List<int> timeslots = List.empty(growable: true);
 
   @override
   void initState() {
-    dates = List.empty(growable: true);
     for (int i = 0; i < 60; i++) {
       dates.add(DateTime.now().add(Duration(days: i)));
     }
-
+    refreshTimeslots();
     super.initState();
+  }
+
+  /// Gets the matches that have been booked for the day the user selected,
+  /// and makes the corresponding timeslots unavailable;
+  refreshTimeslots() {
+    widget.logger.d("Refreshing timeslots");
+
+    timeslots = List.empty(growable: true);
+    for (int i = 0; i < 30; i++) {
+      timeslots.add(480 + i * 30);
+    }
+
+    var pickedDateMatches =
+        widget.club.matches.where((match) => match.date.day == pickedDate.day);
+    if (pickedDateMatches.isNotEmpty) {
+      for (PadelMatch match in pickedDateMatches) {
+        int start =
+            (((match.date.hour * 60 + match.date.minute) - 480) / 30).floor();
+        int end = start + ((match.duration / 30).floor());
+        timeslots.setRange(start, end, List.filled(end, 0));
+      }
+    }
   }
 
   @override
@@ -31,81 +63,165 @@ class _BookingState extends State<Booking> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Row(
-              children: [
-                Container(
-                  height: 120,
-                  width: 80,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(10))),
-                  child: const Icon(Icons.sports_tennis_outlined),
+            Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                children: [
+                  Container(
+                    height: 120,
+                    width: 80,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10))),
+                    child: const Icon(Icons.sports_tennis_outlined),
+                  ),
+                  datePicker(context),
+                ],
+              ),
+            ),
+            timePicker(context),
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: GFButton(
+                onPressed: () => setState(() {
+                  widget.club.matches.add(PadelMatch(
+                      date: DateTime(
+                          pickedDate.year,
+                          pickedDate.month,
+                          pickedDate.day,
+                          (selectedTime / 60).floor(),
+                          selectedTime % 60),
+                      owner: widget.user));
+                  refreshTimeslots();
+                  widget.logger.d(widget.club.matches.toString());
+                }),
+                color: const Color.fromARGB(255, 0, 20, 20),
+                fullWidthButton: true,
+                child: const Text(
+                  "Create match (90 min)",
+                  style: TextStyle(color: Colors.white),
                 ),
-                SizedBox(
-                  height: 120,
-                  width: MediaQuery.of(context).size.width - 150,
-                  child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: dates.length,
-                      itemBuilder: (ctx, i) {
-                        return InkWell(
-                          splashColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () => setState(() {
-                            pickedDate = dates[i];
-                          }),
-                          child: Container(
-                            margin: const EdgeInsets.all(6),
-                            padding: const EdgeInsets.all(6),
-                            width: 50,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  getWeekday(dates[i].weekday),
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      decoration: TextDecoration.none,
-                                      color: Color.fromARGB(255, 0, 20, 20)),
-                                ),
-                                Container(
-                                  height: 40,
-                                  padding: const EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: (pickedDate == dates[i])
-                                          ? const Color.fromARGB(255, 0, 20, 20)
-                                          : Colors.white),
-                                  child: Center(
-                                    child: Text(dates[i].day.toString(),
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            decoration: TextDecoration.none,
-                                            color: (pickedDate == dates[i])
-                                                ? Colors.white
-                                                : const Color.fromARGB(
-                                                    255, 0, 20, 20))),
-                                  ),
-                                ),
-                                Text(getMonth(dates[i].month),
-                                    style: const TextStyle(
-                                        fontSize: 12,
-                                        decoration: TextDecoration.none,
-                                        color: Color.fromARGB(255, 0, 20, 20))),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-              ],
+              ),
             )
           ],
         ),
       ),
+    );
+  }
+
+  SizedBox timePicker(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 350,
+      child: GridView.count(
+          crossAxisCount: 6,
+          childAspectRatio: 30 / 24,
+          children: timeslots.map(
+            (slot) {
+              return GridTile(
+                child: InkWell(
+                  hoverColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  onTap: () {
+                    if (slot != 0) {
+                      setState(() {
+                        selectedTime = slot;
+                        widget.logger.d(
+                            "Selected: ${(slot / 60).floor().toString().padLeft(2, '0')}:${(slot % 60).toString().padLeft(2, '0')} ($slot)");
+                      });
+                    }
+                  },
+                  child: Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: const BorderRadius.all(Radius.circular(5)),
+                      color: (selectedTime != slot)
+                          ? (slot != 0)
+                              ? Colors.white
+                              : Colors.red
+                          : const Color.fromARGB(255, 0, 20, 20),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "${(slot / 60).floor().toString().padLeft(2, '0')}:${(slot % 60).toString().padLeft(2, '0')}",
+                        style: TextStyle(
+                            color: (selectedTime == slot)
+                                ? Colors.white
+                                : const Color.fromARGB(255, 0, 20, 20)),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ).toList()),
+    );
+  }
+
+  SizedBox datePicker(BuildContext context) {
+    return SizedBox(
+      height: 120,
+      width: MediaQuery.of(context).size.width - 150,
+      child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: dates.length,
+          itemBuilder: (ctx, i) {
+            return InkWell(
+              splashColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () => setState(() {
+                pickedDate = dates[i];
+                widget.logger.d("Picked date: ${dates[i]}");
+                selectedTime = 480;
+                refreshTimeslots();
+              }),
+              child: Container(
+                margin: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(6),
+                width: 50,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      getWeekday(dates[i].weekday),
+                      style: const TextStyle(
+                          fontSize: 14,
+                          decoration: TextDecoration.none,
+                          color: Color.fromARGB(255, 0, 20, 20)),
+                    ),
+                    Container(
+                      height: 40,
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: (pickedDate.day == dates[i].day)
+                              ? const Color.fromARGB(255, 0, 20, 20)
+                              : Colors.white),
+                      child: Center(
+                        child: Text(dates[i].day.toString(),
+                            style: TextStyle(
+                                fontSize: 16,
+                                decoration: TextDecoration.none,
+                                color: (pickedDate.day == dates[i].day)
+                                    ? Colors.white
+                                    : const Color.fromARGB(255, 0, 20, 20))),
+                      ),
+                    ),
+                    Text(getMonth(dates[i].month),
+                        style: const TextStyle(
+                            fontSize: 12,
+                            decoration: TextDecoration.none,
+                            color: Color.fromARGB(255, 0, 20, 20))),
+                  ],
+                ),
+              ),
+            );
+          }),
     );
   }
 
