@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/pages/play/booking.dart';
 
 class ClubPage extends StatefulWidget {
   Club club;
@@ -21,18 +22,19 @@ class _ClubPageState extends State<ClubPage>
     const Tab(text: "Reserveren"),
     const Tab(text: "Competities"),
   ];
-  var tabs = <Widget>[
-    const Text("Home", style: TextStyle(fontSize: 16)),
-    const Text("Reserveren", style: TextStyle(fontSize: 16)),
-    const Text("Competities", style: TextStyle(fontSize: 16))
-  ];
-
-  DateTime date = DateTime.now();
+  late List<Widget> tabs;
 
   @override
   initState() {
     _tabController =
         TabController(length: tabNames.length, vsync: this, initialIndex: 1);
+    tabs = <Widget>[
+      const Text("Home", style: TextStyle(fontSize: 16)),
+      Booking(
+        logger: widget.logger,
+      ),
+      const Text("Competities", style: TextStyle(fontSize: 16))
+    ];
 
     super.initState();
   }
@@ -114,6 +116,7 @@ class _ClubPageState extends State<ClubPage>
                         height: 30,
                         child: TabBar(
                             controller: _tabController,
+                            isScrollable: false,
                             indicatorColor:
                                 const Color.fromARGB(255, 0, 20, 20),
                             indicatorSize: TabBarIndicatorSize.tab,
@@ -124,7 +127,11 @@ class _ClubPageState extends State<ClubPage>
           ),
         ),
         SliverFillRemaining(
-          child: TabBarView(controller: _tabController, children: tabs),
+          child: TabBarView(
+            controller: _tabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: tabs,
+          ),
         )
       ],
     );
