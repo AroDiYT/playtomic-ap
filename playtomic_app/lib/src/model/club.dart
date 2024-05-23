@@ -1,6 +1,7 @@
 import 'package:playtomic_app/src/model/user.dart';
 
 class Club {
+  String id;
   String image;
   Map<String, dynamic> location;
   String name;
@@ -8,7 +9,8 @@ class Club {
   List<PadelMatch> matches = [];
 
   Club(
-      {required this.name,
+      {required this.id,
+      required this.name,
       required this.image,
       required this.location,
       this.geo = const {"lat": 0.0, "lng": 0.0}});

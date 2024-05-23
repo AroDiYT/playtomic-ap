@@ -64,16 +64,101 @@ class Database {
     } catch (e) {}
   }
 
+  /// Gets a [Club] from the database
   Future<List<Club>> getClubs() async {
     var clubsSnapshot = await firestore_db.collection("clubs").get();
     var clubs = clubsSnapshot.docs.map((clubDocument) {
       var clubData = clubDocument.data();
       return Club(
+          id: clubDocument.id,
           name: clubData["name"],
           image: clubData["image"],
           location: clubData["location"]);
     }).toList();
 
     return clubs;
+  }
+
+  Future<void> createClub(Club club) async {
+    try {
+      firestore_db.collection('clubs').doc(club.id).snapshots().first;
+      logger.e("Club already exists");
+    } catch (e) {
+      logger.d("Club doesn't exist yet. Creating database entry...");
+      firestore_db.collection('clubs').add({
+        "name": club.name,
+        "image": club.image,
+        "location": club.location,
+      });
+    }
+  }
+
+  /// Updates the [fields] of a user with the given [id] (email) in the database.
+  Future<void> updateClub(Map<String, dynamic> fields, String id) async {
+    try {
+      firestore_db.collection('users').doc(id).snapshots().first;
+      logger.d("Club exists");
+      firestore_db.collection('users').doc(id).update(fields);
+    } catch (e) {
+      logger.e("Club doesn't exist. \n${e.toString()}");
+    }
+  }
+
+  Future<List<PadelMatch>> getAllMatches(String clubId) async {
+    List<PadelMatch> matches = List.empty(growable: true);
+    try {
+      firestore_db
+          .collection("clubs")
+          .doc(clubId)
+          .collection("matches")
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> snap) => {
+                snap.docs.forEach((matchDoc) async {
+                  AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+                  matches.add(
+                      PadelMatch(date: matchDoc.data()["date"], owner: user));
+                })
+              });
+    } catch (e) {
+      logger.e("Error loading all matches.");
+    }
+    return matches;
+  }
+
+  Future<List<PadelMatch>> getMatchesByDate(
+      String clubId, DateTime date) async {
+    List<PadelMatch> matches = List.empty(growable: true);
+    try {
+      firestore_db
+          .collection("clubs")
+          .doc(clubId)
+          .collection("matches")
+          .where("date",
+              isEqualTo:
+                  "${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}")
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> snap) => {
+                snap.docs.forEach((matchDoc) async {
+                  AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+                  matches.add(PadelMatch(
+                      date: DateTime.parse(matchDoc.data()["date"]),
+                      owner: user));
+                })
+              });
+    } catch (e) {
+      logger.e("Error loading all matches.");
+    }
+    return matches;
+  }
+
+  Future<void> createMatch(Club club, PadelMatch match) async {
+    try {
+      firestore_db.collection('clubs').doc(club.id).collection('matches').add({
+        "date":
+            "${match.date.year}/${match.date.month.toString().padLeft(2, '0')}/${match.date.day.toString().padLeft(2, '0')}",
+        "duration": match.duration,
+        "ownerId": match.owner.email,
+      });
+    } catch (e) {}
   }
 }

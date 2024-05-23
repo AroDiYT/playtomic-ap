@@ -48,7 +48,10 @@ class _PlayContentState extends State<PlayContent> {
       future: getUser(),
       builder: (ctx, snap) {
         if (snap.data == null) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+              child: CircularProgressIndicator(
+            color: Color.fromARGB(255, 0, 20, 20),
+          ));
         }
 
         AppUser user = snap.data!;
@@ -346,6 +349,7 @@ class _PlayContentState extends State<PlayContent> {
                                                   ClubPage(
                                                     user: user,
                                                     club: Club(
+                                                        id: document.id,
                                                         name: clubData["name"],
                                                         image:
                                                             clubData["image"],
