@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/model/club.dart';
 import 'package:playtomic_app/src/model/user.dart';
@@ -35,10 +36,12 @@ class _ClubPageState extends State<ClubPage>
         TabController(length: tabNames.length, vsync: this, initialIndex: 1);
     tabs = <Widget>[
       const Text("Home", style: TextStyle(fontSize: 16)),
-      Booking(
-        logger: widget.logger,
-        club: widget.club,
-        user: widget.user,
+      SingleChildScrollView(
+        child: Booking(
+          logger: widget.logger,
+          club: widget.club,
+          user: widget.user,
+        ),
       ),
       const Text("Competities", style: TextStyle(fontSize: 16))
     ];

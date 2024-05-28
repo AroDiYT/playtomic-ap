@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:logger/logger.dart';
@@ -26,41 +28,41 @@ class _BookingState extends State<Booking> {
   var selectedTime = 480;
   List<DateTime> dates = List.empty(growable: true);
   late Future<List<int>> timeslots;
-  List<bool> reserved = List.generate(30, (index) => false);
+  late Future<List<bool>> reserved;
 
   @override
   void initState() {
     for (int i = 0; i < 60; i++) {
       dates.add(DateTime.now().add(Duration(days: i)));
     }
-    timeslots = refreshTimeslots();
+    reserved = refreshTimeslots();
     super.initState();
   }
 
   /// Gets the matches that have been booked for the day the user selected,
   /// and makes the corresponding timeslots unavailable;
-  Future<List<int>> refreshTimeslots() async {
+  Future<List<bool>> refreshTimeslots() async {
     widget.logger.d("Refreshing timeslots");
 
-    var slots = List<int>.empty(growable: true);
+    //List<bool> slots = List.generate(30, (index) => false);
     return await widget.db
         .getMatchesByDate(widget.club.id, pickedDate)
         .then((taken) {
-      for (int i = 0; i < 30; i++) {
-        slots.add(480 + i * 30);
-      }
+      List<bool> slots = List.generate(32, (index) => false);
+      slots.setRange(30, 31, List.filled(2, true));
 
       if (taken.isNotEmpty) {
         widget.logger.d("Checking retrieved matches");
+
         for (PadelMatch match in taken) {
           int start =
               (((match.date.hour * 60 + match.date.minute) - 480) / 30).floor();
           int end = start + ((match.duration / 30).floor());
-          reserved.setRange(start, end, List.filled(end, true));
+          slots.setRange(start, end, List.filled(end, true));
         }
       }
 
-      widget.logger.d(taken);
+      widget.logger.d("$taken\n$slots");
 
       return slots;
     });
@@ -92,66 +94,119 @@ class _BookingState extends State<Booking> {
               ),
             ),
             FutureBuilder(
-                future: timeslots,
+                future: reserved,
                 builder: (ctx, snap) {
                   if (snap.hasData) {
-                    return timePicker(ctx, snap.data!);
+                    var reservedSlots = snap.data!;
+                    int selectedSlot = ((selectedTime - 480) / 30).floor();
+
+                    return Column(
+                      children: [
+                        timePicker(ctx, reservedSlots),
+                        Container(
+                          alignment: Alignment.topLeft,
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reserveer je plaats in een openbare reservering",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                  "In een openbare reservering speel je mee met nieuwe, onbekende spelers van jouw niveau")
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 50,
+                        ),
+                        Container(
+                          alignment: Alignment.topLeft,
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reserveer een privé baan",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                  "In een privé reservering kunnen enkel spelers meedoen die je uitnodigt")
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          child: GFButton(
+                            onPressed: () {
+                              (reservedSlots[selectedSlot + 1] ||
+                                      reservedSlots[selectedSlot + 2])
+                                  ? null
+                                  : setState(() {
+                                      var match = PadelMatch(
+                                          date: DateTime(
+                                              pickedDate.year,
+                                              pickedDate.month,
+                                              pickedDate.day,
+                                              (selectedTime / 60).floor(),
+                                              selectedTime % 60),
+                                          owner: widget.user);
+                                      widget.club.matches.add(match);
+
+                                      reserved = refreshTimeslots();
+
+                                      widget.logger
+                                          .d(widget.club.matches.toString());
+                                      widget.db.createMatch(widget.club, match);
+                                    });
+                            },
+                            color: (reservedSlots[selectedSlot + 1] ||
+                                    reservedSlots[selectedSlot + 2])
+                                ? Colors.grey
+                                : const Color.fromARGB(255, 0, 20, 20),
+                            fullWidthButton: true,
+                            child: const Text(
+                              "Create match (90 min)",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
                   } else {
                     return const CircularProgressIndicator(
                       color: Color.fromARGB(255, 0, 20, 20),
                     );
                   }
                 }),
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: GFButton(
-                onPressed: () => setState(() {
-                  var match = PadelMatch(
-                      date: DateTime(
-                          pickedDate.year,
-                          pickedDate.month,
-                          pickedDate.day,
-                          (selectedTime / 60).floor(),
-                          selectedTime % 60),
-                      owner: widget.user);
-                  widget.club.matches.add(match);
-
-                  setState(() {
-                    timeslots = refreshTimeslots();
-                  });
-                  widget.logger.d(widget.club.matches.toString());
-                  widget.db.createMatch(widget.club, match);
-                }),
-                color: const Color.fromARGB(255, 0, 20, 20),
-                fullWidthButton: true,
-                child: const Text(
-                  "Create match (90 min)",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            )
           ],
         ),
       ),
     );
   }
 
-  SizedBox timePicker(BuildContext context, List<int> timeslots) {
+  SizedBox timePicker(BuildContext context, List<bool> reservedSlots) {
+    List<int> slots = [];
+    for (int i = 0; i < 30; i++) {
+      slots.add(480 + i * 30);
+    }
+
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      height: 350,
+      height: 300,
       child: GridView.count(
           crossAxisCount: 6,
           childAspectRatio: 30 / 24,
-          children: timeslots.map(
+          children: slots.map(
             (slot) {
               return GridTile(
                 child: InkWell(
                   hoverColor: Colors.transparent,
                   splashColor: Colors.transparent,
-                  onTap: (!reserved[((slot - 480) / 30).floor()])
+                  onTap: (!reservedSlots[((slot - 480) / 30).floor()])
                       ? () {
-                          if (!reserved[((slot - 480) / 30).floor()]) {
+                          if (!reservedSlots[((slot - 480) / 30).floor()]) {
                             setState(() {
                               selectedTime = slot;
                               widget.logger.d(
@@ -167,7 +222,7 @@ class _BookingState extends State<Booking> {
                       border: Border.all(color: Colors.grey),
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
                       color: (selectedTime != slot)
-                          ? (!reserved[((slot - 480) / 30).floor()])
+                          ? (!reservedSlots[((slot - 480) / 30).floor()])
                               ? Colors.white
                               : Colors.grey
                           : const Color.fromARGB(255, 0, 20, 20),
@@ -207,7 +262,7 @@ class _BookingState extends State<Booking> {
                 selectedTime = 480;
 
                 setState(() {
-                  timeslots = refreshTimeslots();
+                  reserved = refreshTimeslots();
                 });
               }),
               child: Container(
