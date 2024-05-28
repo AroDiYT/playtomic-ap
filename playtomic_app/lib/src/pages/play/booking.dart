@@ -26,6 +26,7 @@ class _BookingState extends State<Booking> {
   var selectedTime = 480;
   List<DateTime> dates = List.empty(growable: true);
   late Future<List<int>> timeslots;
+  List<bool> reserved = List.generate(30, (index) => false);
 
   @override
   void initState() {
@@ -55,7 +56,7 @@ class _BookingState extends State<Booking> {
           int start =
               (((match.date.hour * 60 + match.date.minute) - 480) / 30).floor();
           int end = start + ((match.duration / 30).floor());
-          slots.setRange(start, end, List.filled(end, 0));
+          reserved.setRange(start, end, List.filled(end, true));
         }
       }
 
@@ -148,9 +149,9 @@ class _BookingState extends State<Booking> {
                 child: InkWell(
                   hoverColor: Colors.transparent,
                   splashColor: Colors.transparent,
-                  onTap: (slot != 0)
+                  onTap: (!reserved[((slot - 480) / 30).floor()])
                       ? () {
-                          if (slot != 0) {
+                          if (!reserved[((slot - 480) / 30).floor()]) {
                             setState(() {
                               selectedTime = slot;
                               widget.logger.d(
@@ -166,7 +167,7 @@ class _BookingState extends State<Booking> {
                       border: Border.all(color: Colors.grey),
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
                       color: (selectedTime != slot)
-                          ? (slot != 0)
+                          ? (!reserved[((slot - 480) / 30).floor()])
                               ? Colors.white
                               : Colors.grey
                           : const Color.fromARGB(255, 0, 20, 20),
