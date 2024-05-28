@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
@@ -101,10 +102,10 @@ class _BookingState extends State<Booking> {
                     int selectedSlot = ((selectedTime - 480) / 30).floor();
 
                     return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        timePicker(ctx, reservedSlots),
+                        Center(child: timePicker(ctx, reservedSlots)),
                         Container(
-                          alignment: Alignment.topLeft,
                           child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -118,11 +119,30 @@ class _BookingState extends State<Booking> {
                             ],
                           ),
                         ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 20),
+                          padding: const EdgeInsets.all(10),
+                          height: 200,
+                          width: 300,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${pickedDate.day} ${getMonth(pickedDate.month)} | ${(selectedTime / 60).floor().toString().padLeft(2, '0')}:${(selectedTime % 60).toString().padLeft(2, '0')}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
+                        ),
                         const SizedBox(
                           height: 50,
                         ),
                         Container(
-                          alignment: Alignment.topLeft,
                           child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
