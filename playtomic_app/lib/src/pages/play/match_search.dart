@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
-import 'package:playtomic_app/src/model/club.dart';
 import 'package:playtomic_app/src/model/match.dart';
 import 'package:playtomic_app/src/model/user.dart';
 
@@ -157,141 +156,42 @@ class _MatchSearchState extends State<MatchSearch>
             const SizedBox(
               height: 10,
             ),
-            IntrinsicHeight(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 80,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: (match.team1.isEmpty)
-                        ? defaultTeamMember(1)
-                        : FutureBuilder(
-                            future: widget.db.loadUser(match.team1[0]),
-                            builder: (ctx, snap) {
-                              if (snap.hasData) {
-                                AppUser user = snap.data!;
+            FutureBuilder(
+                future: Future.wait([
+                  (match.team1.isNotEmpty)
+                      ? widget.db.loadUser(match.team1[0])
+                      : Future.value(null),
+                  (match.team1.length > 1)
+                      ? widget.db.loadUser(match.team1[1])
+                      : Future.value(null),
+                  (match.team2.isNotEmpty)
+                      ? widget.db.loadUser(match.team2[0])
+                      : Future.value(null),
+                  (match.team2.length > 1)
+                      ? widget.db.loadUser(match.team2[1])
+                      : Future.value(null),
+                ]),
+                builder: (context, snapshot) {
+                  var players = List.generate(4, (index) => teamMember(null));
 
-                                return Column(
-                                  children: [
-                                    GFAvatar(
-                                      backgroundColor:
-                                          const Color.fromARGB(255, 0, 20, 20),
-                                      child: Text(user.name[0]),
-                                    ),
-                                    Expanded(
-                                        child: Text(
-                                      user.name.split(' ')[0],
-                                      overflow: TextOverflow.ellipsis,
-                                    ))
-                                  ],
-                                );
-                              } else {
-                                return defaultTeamMember(1);
-                              }
-                            },
-                          ),
-                  ),
-                  Container(
-                    width: 80,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: (match.team1.length <= 1)
-                        ? defaultTeamMember(1)
-                        : FutureBuilder(
-                            future: widget.db.loadUser(match.team1[1]),
-                            builder: (ctx, snap) {
-                              if (snap.hasData) {
-                                AppUser user = snap.data!;
+                  if (snapshot.hasData) {
+                    players = snapshot.data!.map((e) => teamMember(e)).toList();
+                  }
 
-                                return Column(
-                                  children: [
-                                    GFAvatar(
-                                      backgroundColor:
-                                          const Color.fromARGB(255, 0, 20, 20),
-                                      child: Text(user.name[0]),
-                                    ),
-                                    Expanded(
-                                        child: Text(
-                                      user.name.split(' ')[0],
-                                      overflow: TextOverflow.ellipsis,
-                                    ))
-                                  ],
-                                );
-                              } else {
-                                return defaultTeamMember(1);
-                              }
-                            },
-                          ),
-                  ),
-                  VerticalDivider(
-                    thickness: 1,
-                    color: Colors.grey.shade700,
-                  ),
-                  Container(
-                    width: 80,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: (match.team2.isEmpty)
-                        ? defaultTeamMember(2)
-                        : FutureBuilder(
-                            future: widget.db.loadUser(match.team2[0]),
-                            builder: (ctx, snap) {
-                              if (snap.hasData) {
-                                AppUser user = snap.data!;
-
-                                return Column(
-                                  children: [
-                                    GFAvatar(
-                                      backgroundColor:
-                                          const Color.fromARGB(255, 0, 20, 20),
-                                      child: Text(user.name[0]),
-                                    ),
-                                    Expanded(
-                                        child: Text(
-                                      user.name.split(' ')[0],
-                                      overflow: TextOverflow.ellipsis,
-                                    ))
-                                  ],
-                                );
-                              } else {
-                                return defaultTeamMember(2);
-                              }
-                            },
-                          ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    width: 80,
-                    child: (match.team2.length <= 1)
-                        ? defaultTeamMember(2)
-                        : FutureBuilder(
-                            future: widget.db.loadUser(match.team2[1]),
-                            builder: (ctx, snap) {
-                              if (snap.hasData) {
-                                AppUser user = snap.data!;
-
-                                return Column(
-                                  children: [
-                                    GFAvatar(
-                                      backgroundColor:
-                                          const Color.fromARGB(255, 0, 20, 20),
-                                      child: Text(user.name[0]),
-                                    ),
-                                    Expanded(
-                                        child: Text(
-                                      user.name.split(' ')[0],
-                                      overflow: TextOverflow.ellipsis,
-                                    ))
-                                  ],
-                                );
-                              } else {
-                                return defaultTeamMember(2);
-                              }
-                            },
-                          ),
-                  ),
-                ],
-              ),
-            ),
+                  return IntrinsicHeight(
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                        players[0],
+                        players[1],
+                        VerticalDivider(
+                          thickness: 1,
+                          color: Colors.grey.shade700,
+                        ),
+                        players[2],
+                        players[3],
+                      ]));
+                }),
             const SizedBox(
               height: 10,
             ),
@@ -345,26 +245,44 @@ class _MatchSearchState extends State<MatchSearch>
     );
   }
 
-  Widget defaultTeamMember(int team) {
-    var children = (team == 1)
-        ? [
-            GFAvatar(
-              backgroundColor: Colors.lightBlue.shade300,
-              child: const Icon(Icons.person),
-            ),
-            const Text("Vrij")
-          ]
-        : [
-            GFAvatar(
-              backgroundColor: Colors.red.shade300,
-              foregroundColor: Colors.red,
-              child: const Icon(Icons.person),
-            ),
-            const Text("Vrij")
-          ];
+  Widget teamMember(AppUser? user) {
+    var children = <Widget>[];
 
-    return Column(
-      children: children,
+    if (user == null) {
+      children = [
+        Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(30)),
+              border: Border.all(color: Colors.blue)),
+          child: const Icon(
+            Icons.add,
+            color: Colors.blue,
+          ),
+        ),
+        const Text("Vrij")
+      ];
+    } else {
+      children = [
+        GFAvatar(
+          backgroundColor: const Color.fromARGB(255, 0, 20, 20),
+          child: Text(user.name[0]),
+        ),
+        Expanded(
+            child: Text(
+          user.name.split(' ')[0],
+          overflow: TextOverflow.ellipsis,
+        ))
+      ];
+    }
+
+    return Container(
+      width: 80,
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: children,
+      ),
     );
   }
 
