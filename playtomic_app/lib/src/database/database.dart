@@ -163,7 +163,8 @@ class Database {
     }
   }
 
-  Future<void> createMatch(Club club, PadelMatch match) async {
+  Future<void> createMatch(Club club, PadelMatch match,
+      {bool isPublic = false}) async {
     try {
       firestore_db.collection('clubs').doc(club.id).collection('matches').add({
         "date":
@@ -172,9 +173,10 @@ class Database {
             "${match.date.hour.toString().padLeft(2, '0')}:${match.date.minute.toString().padLeft(2, '0')}:00",
         "duration": match.duration,
         "ownerId": match.owner.email,
+        "public": isPublic
       });
       logger.d(
-          "$this: Added the following match to the club \"${club.name}\": ${match.toString()}");
+          "$this: Added the following ${(isPublic) ? "public" : "private"} match to the club \"${club.name}\": ${match.toString()}");
     } catch (e) {}
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:getwidget/components/button/gf_button.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/club.dart';
@@ -28,7 +30,6 @@ class _BookingState extends State<Booking> {
   var pickedDate = DateTime.now();
   var selectedTime = 480;
   List<DateTime> dates = List.empty(growable: true);
-  late Future<List<int>> timeslots;
   late Future<List<bool>> reserved;
 
   @override
@@ -43,7 +44,7 @@ class _BookingState extends State<Booking> {
   /// Gets the matches that have been booked for the day the user selected,
   /// and makes the corresponding timeslots unavailable;
   Future<List<bool>> refreshTimeslots() async {
-    widget.logger.d("Refreshing timeslots");
+    widget.logger.d("$this: Refreshing timeslots");
 
     //List<bool> slots = List.generate(30, (index) => false);
     return await widget.db
@@ -53,7 +54,7 @@ class _BookingState extends State<Booking> {
       slots.setRange(30, 31, List.filled(2, true));
 
       if (taken.isNotEmpty) {
-        widget.logger.d("Checking retrieved matches");
+        widget.logger.d("$this: Checking retrieved matches");
 
         for (PadelMatch match in taken) {
           int start =
@@ -63,7 +64,7 @@ class _BookingState extends State<Booking> {
         }
       }
 
-      widget.logger.d("$taken\n$slots");
+      widget.logger.d("$this: $taken\n$slots");
 
       return slots;
     });
@@ -119,26 +120,221 @@ class _BookingState extends State<Booking> {
                             ],
                           ),
                         ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 20),
-                          padding: const EdgeInsets.all(10),
-                          height: 200,
-                          width: 300,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "${pickedDate.day} ${getMonth(pickedDate.month)} | ${(selectedTime / 60).floor().toString().padLeft(2, '0')}:${(selectedTime % 60).toString().padLeft(2, '0')}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ],
+                        if (!(reservedSlots[selectedSlot + 1] ||
+                            reservedSlots[selectedSlot + 2]))
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 20),
+                            padding: const EdgeInsets.all(10),
+                            height: 240,
+                            width: 328,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey)),
+                            child: Stack(
+                              children: [
+                                IntrinsicWidth(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${pickedDate.day} ${getMonth(pickedDate.month)} | ${(selectedTime / 60).floor().toString().padLeft(2, '0')}:${(selectedTime % 60).toString().padLeft(2, '0')}",
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Row(
+                                        children: [
+                                          Icon(Icons
+                                              .signal_cellular_alt_outlined),
+                                          SizedBox(
+                                            width: 6,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              "De eerste speler bepaalt of het een competitie is.",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      IntrinsicHeight(
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                children: [
+                                                  GFAvatar(
+                                                    backgroundColor:
+                                                        Colors.red.shade300,
+                                                    foregroundColor: Colors.red,
+                                                    child: const Icon(
+                                                        Icons.person),
+                                                  ),
+                                                  const Text("Vrij")
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                children: [
+                                                  GFAvatar(
+                                                    backgroundColor:
+                                                        Colors.red.shade300,
+                                                    foregroundColor: Colors.red,
+                                                    child: const Icon(
+                                                        Icons.person),
+                                                  ),
+                                                  const Text("Vrij")
+                                                ],
+                                              ),
+                                            ),
+                                            VerticalDivider(
+                                              thickness: 1,
+                                              color: Colors.grey.shade700,
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                children: [
+                                                  GFAvatar(
+                                                    backgroundColor: Colors
+                                                        .lightBlue.shade300,
+                                                    child: const Icon(
+                                                        Icons.person),
+                                                  ),
+                                                  const Text("Vrij")
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                children: [
+                                                  GFAvatar(
+                                                    backgroundColor: Colors
+                                                        .lightBlue.shade300,
+                                                    child: const Icon(
+                                                        Icons.person),
+                                                  ),
+                                                  const Text("Vrij")
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Divider(
+                                        thickness: 1,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const ImageIcon(
+                                              AssetImage(
+                                                  "assets/images/PT_logo.png"),
+                                              size: 30),
+                                          const SizedBox(width: 10),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(widget.club.name),
+                                              Text(
+                                                widget.club.location["city"],
+                                                style: TextStyle(
+                                                    color:
+                                                        Colors.grey.shade700),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            width: 80,
+                                          ),
+                                          const Column(
+                                            children: [
+                                              Text(
+                                                "€ 8",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.blue),
+                                              ),
+                                              Text("90 min",
+                                                  style: TextStyle(
+                                                      color: Colors.blue))
+                                            ],
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(35, 80, 35, 0),
+                                  child: GFButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        var match = PadelMatch(
+                                            date: DateTime(
+                                                pickedDate.year,
+                                                pickedDate.month,
+                                                pickedDate.day,
+                                                (selectedTime / 60).floor(),
+                                                selectedTime % 60),
+                                            owner: widget.user);
+
+                                        widget.db.createMatch(
+                                            widget.club, match,
+                                            isPublic: true);
+
+                                        reserved = refreshTimeslots();
+                                      });
+                                    },
+                                    color: Colors.blue.shade700,
+                                    shape: GFButtonShape.pills,
+                                    boxShadow: BoxShadow(
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
+                                        color: Colors.grey.shade700),
+                                    child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text("Reserveer de eerste plaats")
+                                        ]),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                         const SizedBox(
                           height: 50,
                         ),
