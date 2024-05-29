@@ -196,11 +196,50 @@ class Database {
     }
   }
 
+  /// Retrieves all the matches where [user] is the owner.
   Future<List<PadelMatch>> getMatchesByUser(AppUser user) async {
     try {
       var snap = await firestore_db
           .collection("matches")
           .where("ownerId", isEqualTo: user.email)
+          .get();
+
+      var matches = await Future.wait(snap.docs.map((matchDoc) async {
+        logger.d(
+            "Database: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
+
+        AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+        Club club = await getClub(matchDoc.data()["clubId"]);
+
+        logger.d("Database: OwnerId: ${user.email}");
+
+        // Add the match to the list
+        return PadelMatch(
+            date: DateTime.parse(
+                matchDoc.data()["date"] + " " + matchDoc.data()["time"]),
+            duration: matchDoc.data()["duration"],
+            owner: user,
+            club: club,
+            isPublic: matchDoc.data()["isPublic"],
+            team1: matchDoc.data()["team1"],
+            team2: matchDoc.data()["team2"]);
+      }).toList());
+
+      logger.d("Database: Matches by user: $matches");
+      return matches;
+    } catch (e) {
+      logger.e(
+          "Database: Error loading matches where the user is owner. \n${e.toString()}");
+      return List<PadelMatch>.empty();
+    }
+  }
+
+  /// Retrieves all the matches from all the clubs that are open to join.
+  Future<List<PadelMatch>> getOpenMatches() async {
+    try {
+      var snap = await firestore_db
+          .collection("matches")
+          .where("isPublic", isEqualTo: true)
           .get();
 
       var matches = await Future.wait(snap.docs.map((matchDoc) async {
@@ -224,10 +263,10 @@ class Database {
             team2: matchDoc.data()["team2"]);
       }).toList());
 
-      logger.d("$this: Matches: $matches");
+      logger.d("Database: Open matches: $matches");
       return matches;
     } catch (e) {
-      logger.e("$this: Error loading matches. \n${e.toString()}");
+      logger.e("Database: Error loading open matches. \n${e.toString()}");
       return List<PadelMatch>.empty();
     }
   }

@@ -72,9 +72,29 @@ class _MatchSearchState extends State<MatchSearch>
         ],
         body: TabBarView(
             controller: _tabController,
-            children: [const Text("Beschikbaar"), yourMatches()]),
+            children: [openMatches(), yourMatches()]),
       ),
     );
+  }
+
+  Widget openMatches() {
+    return FutureBuilder(
+        future: widget.db.getOpenMatches(),
+        builder: (ctx, snap) {
+          if (snap.hasData) {
+            List<PadelMatch> matches = snap.data!;
+
+            if (matches.isEmpty) return const Text("OOPS! No matches found.");
+
+            return Column(
+                children: matches.map((match) => matchCard(match)).toList());
+          } else {
+            return const Center(
+                child: CircularProgressIndicator(
+              color: Color.fromARGB(255, 0, 20, 20),
+            ));
+          }
+        });
   }
 
   Widget yourMatches() {
@@ -105,9 +125,17 @@ class _MatchSearchState extends State<MatchSearch>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "${match.date.day} ${getMonth(match.date.month)} | ${match.date.hour.toString().padLeft(2, '0')}:${match.date.minute.toString().padLeft(2, '0')}",
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "${match.date.day} ${getMonth(match.date.month)} | ${match.date.hour.toString().padLeft(2, '0')}:${match.date.minute.toString().padLeft(2, '0')}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                (match.isPublic)
+                    ? const Text("Open match")
+                    : const Text("Privé match")
+              ],
             ),
             const SizedBox(
               height: 10,
