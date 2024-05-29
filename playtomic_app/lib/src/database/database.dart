@@ -15,7 +15,7 @@ class Database {
   // TODO: Finish this method
   /// Gets a [AppUser] from the database
   Future<AppUser> loadUser(String id) async {
-    logger.d("$this: Loading User");
+    logger.d("Database: Loading User");
     var snapshot =
         await firestore_db.collection('users').doc(id).snapshots().first;
 
@@ -30,9 +30,9 @@ class Database {
   Future<void> createUser(AppUser user) async {
     try {
       firestore_db.collection('users').doc(user.email).snapshots().first;
-      logger.e("$this: User already exists");
+      logger.e("Database: User already exists");
     } catch (e) {
-      logger.d("$this: User doesn't exist yet. Creating database entry...");
+      logger.d("Database: User doesn't exist yet. Creating database entry...");
       firestore_db.collection('users').doc(user.email).set(<String, dynamic>{});
     }
   }
@@ -41,10 +41,10 @@ class Database {
   Future<void> updateUser(Map<String, dynamic> fields, String email) async {
     try {
       firestore_db.collection('users').doc(email).snapshots().first;
-      logger.d("$this: User exists");
+      logger.d("Database: User exists");
       firestore_db.collection('users').doc(email).update(fields);
     } catch (e) {
-      logger.e("$this: User doesn't exist.");
+      logger.e("Database: User doesn't exist.");
     }
   }
 
@@ -57,7 +57,7 @@ class Database {
           .doc(auth_db.currentUser!.email)
           .snapshots()
           .first;
-      logger.d("$this: User exists");
+      logger.d("Database: User exists");
       auth_db.currentUser!.reauthenticateWithCredential(credential);
       firestore_db.collection('users').doc(auth_db.currentUser!.email).delete();
     } catch (e) {}
@@ -69,11 +69,11 @@ class Database {
     var clubs = clubsSnapshot.docs.map((clubDocument) {
       var clubData = clubDocument.data();
       return Club(
-        id: clubDocument.id,
-        name: clubData["name"],
-        image: clubData["image"],
-        location: clubData["location"],
-      );
+          id: clubDocument.id,
+          name: clubData["name"],
+          image: clubData["image"],
+          location: clubData["location"],
+          geo: clubData["geo"]);
     }).toList();
 
     return clubs;
@@ -88,7 +88,7 @@ class Database {
 
     var club = clubsSnapshot.data()!;
 
-    logger.d("Found club with name: ${club["name"]}");
+    logger.d("Database: Found club with name: ${club["name"]}");
 
     return Club(
       id: clubId,
@@ -101,9 +101,9 @@ class Database {
   Future<void> createClub(Club club) async {
     try {
       firestore_db.collection('clubs').doc(club.id).snapshots().first;
-      logger.e("Club already exists");
+      logger.e("Database: Club already exists");
     } catch (e) {
-      logger.d("Club doesn't exist yet. Creating database entry...");
+      logger.d("Database: Club doesn't exist yet. Creating database entry...");
       firestore_db.collection('clubs').add({
         "name": club.name,
         "image": club.image,
@@ -116,10 +116,10 @@ class Database {
   Future<void> updateClub(Map<String, dynamic> fields, String id) async {
     try {
       firestore_db.collection('users').doc(id).snapshots().first;
-      logger.d("Club exists");
+      logger.d("Database: Club exists");
       firestore_db.collection('users').doc(id).update(fields);
     } catch (e) {
-      logger.e("Club doesn't exist. \n${e.toString()}");
+      logger.e("Database: Club doesn't exist. \n${e.toString()}");
     }
   }
 
@@ -148,7 +148,7 @@ class Database {
                 })
               });
     } catch (e) {
-      logger.e("$this: Error loading all matches.");
+      logger.e("Database: Error loading all matches.");
     }
     return matches;
   }
@@ -248,12 +248,12 @@ class Database {
 
       var matches = await Future.wait(snap.docs.map((matchDoc) async {
         logger.d(
-            "$this: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
+            "Database: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
 
         AppUser user = await loadUser(matchDoc.data()["ownerId"]);
         Club club = await getClub(matchDoc.data()["clubId"]);
 
-        logger.d("$this: OwnerId: ${user.email}");
+        logger.d("Database: OwnerId: ${user.email}");
 
         // Add the match to the list
         return PadelMatch(
