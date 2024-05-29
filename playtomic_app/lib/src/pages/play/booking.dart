@@ -47,7 +47,6 @@ class _BookingState extends State<Booking> {
   Future<List<bool>> refreshTimeslots() async {
     widget.logger.d("$this: Refreshing timeslots");
 
-    //List<bool> slots = List.generate(30, (index) => false);
     return await widget.db
         .getMatchesByDate(widget.club.id, pickedDate)
         .then((taken) {
