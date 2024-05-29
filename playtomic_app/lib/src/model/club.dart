@@ -20,8 +20,15 @@ class PadelMatch {
   DateTime date;
   int duration;
   AppUser owner;
+  Club club;
+  bool isPublic;
 
-  PadelMatch({required this.date, this.duration = 90, required this.owner});
+  PadelMatch(
+      {required this.date,
+      this.duration = 90,
+      required this.owner,
+      required this.club,
+      this.isPublic = false});
 
   @override
   String toString() {
@@ -43,6 +50,7 @@ class PadelMatch {
     return PadelMatch(
         date: DateTime.parse(json['date']),
         duration: json['duration'],
-        owner: json['owner']);
+        owner: json['owner'],
+        club: json['club']);
   }
 }

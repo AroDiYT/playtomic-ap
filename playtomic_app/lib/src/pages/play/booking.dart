@@ -304,11 +304,14 @@ class _BookingState extends State<Booking> {
                                                 pickedDate.day,
                                                 (selectedTime / 60).floor(),
                                                 selectedTime % 60),
-                                            owner: widget.user);
+                                            owner: widget.user,
+                                            club: widget.club,
+                                            isPublic: true);
 
                                         widget.db.createMatch(
-                                            widget.club, match,
-                                            isPublic: true);
+                                          widget.club,
+                                          match,
+                                        );
 
                                         reserved = refreshTimeslots();
                                       });
@@ -367,7 +370,8 @@ class _BookingState extends State<Booking> {
                                               pickedDate.day,
                                               (selectedTime / 60).floor(),
                                               selectedTime % 60),
-                                          owner: widget.user);
+                                          owner: widget.user,
+                                          club: widget.club);
                                       widget.club.matches.add(match);
 
                                       reserved = refreshTimeslots();

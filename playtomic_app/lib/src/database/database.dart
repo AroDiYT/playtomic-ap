@@ -62,19 +62,39 @@ class Database {
     } catch (e) {}
   }
 
-  /// Gets a [Club] from the database
+  /// Gets all [Club]s from the database
   Future<List<Club>> getClubs() async {
     var clubsSnapshot = await firestore_db.collection("clubs").get();
     var clubs = clubsSnapshot.docs.map((clubDocument) {
       var clubData = clubDocument.data();
       return Club(
-          id: clubDocument.id,
-          name: clubData["name"],
-          image: clubData["image"],
-          location: clubData["location"]);
+        id: clubDocument.id,
+        name: clubData["name"],
+        image: clubData["image"],
+        location: clubData["location"],
+      );
     }).toList();
 
     return clubs;
+  }
+
+  /// Gets all [Club]s from the database
+  Future<Club> getClub(String clubId) async {
+    logger.d("Database: Getting club with id: $clubId");
+
+    var clubsSnapshot =
+        await firestore_db.collection("clubs").doc(clubId).get();
+
+    var club = clubsSnapshot.data()!;
+
+    logger.d("Found club with name: ${club["name"]}");
+
+    return Club(
+      id: clubId,
+      name: club["name"],
+      image: club["image"],
+      location: club["location"],
+    );
   }
 
   Future<void> createClub(Club club) async {
@@ -113,12 +133,15 @@ class Database {
           .then((QuerySnapshot<Map<String, dynamic>> snap) => {
                 snap.docs.forEach((matchDoc) async {
                   AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+                  Club club = await getClub(clubId);
+
                   matches.add(PadelMatch(
                       date: DateTime.parse(matchDoc.data()["date"] +
                           " " +
                           matchDoc.data()["time"]),
                       duration: matchDoc.data()["duration"],
-                      owner: user));
+                      owner: user,
+                      club: club));
                 })
               });
     } catch (e) {
@@ -129,9 +152,11 @@ class Database {
 
   Future<List<PadelMatch>> getMatchesByDate(
       String clubId, DateTime date) async {
-    logger.d("$this: Getting matches from ${date.toString()}");
+    logger.d("Database: Getting matches from ${date.toString()}");
 
     try {
+      Club club = await getClub(clubId);
+
       var snap = await firestore_db
           .collection("clubs")
           .doc(clubId)
@@ -143,16 +168,48 @@ class Database {
 
       var matches = await Future.wait(snap.docs.map((matchDoc) async {
         logger.d(
+            "Database: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
+
+        AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+
+        logger.d("Database: OwnerId: ${user.email}");
+        return PadelMatch(
+            date: DateTime.parse(
+                matchDoc.data()["date"] + " " + matchDoc.data()["time"]),
+            duration: matchDoc.data()["duration"],
+            owner: user,
+            club: club);
+      }).toList());
+
+      logger.d("Database: Matches: $matches");
+      return matches;
+    } catch (e) {
+      logger.e("Database: Error loading matches. \n${e.toString()}");
+      return List<PadelMatch>.empty();
+    }
+  }
+
+  Future<List<PadelMatch>> getMatchesByUser(AppUser user) async {
+    try {
+      var snap = await firestore_db
+          .collection("matches")
+          .where("ownerId", isEqualTo: user.email)
+          .get();
+
+      var matches = await Future.wait(snap.docs.map((matchDoc) async {
+        logger.d(
             "$this: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
 
         AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+        Club club = await getClub(matchDoc.data()["clubId"]);
 
         logger.d("$this: OwnerId: ${user.email}");
         return PadelMatch(
             date: DateTime.parse(
                 matchDoc.data()["date"] + " " + matchDoc.data()["time"]),
             duration: matchDoc.data()["duration"],
-            owner: user);
+            owner: user,
+            club: club);
       }).toList());
 
       logger.d("$this: Matches: $matches");
@@ -163,8 +220,10 @@ class Database {
     }
   }
 
-  Future<void> createMatch(Club club, PadelMatch match,
-      {bool isPublic = false}) async {
+  Future<void> createMatch(
+    Club club,
+    PadelMatch match,
+  ) async {
     try {
       firestore_db.collection('clubs').doc(club.id).collection('matches').add({
         "date":
@@ -173,10 +232,22 @@ class Database {
             "${match.date.hour.toString().padLeft(2, '0')}:${match.date.minute.toString().padLeft(2, '0')}:00",
         "duration": match.duration,
         "ownerId": match.owner.email,
-        "public": isPublic
+        "public": match.isPublic
       });
+
+      firestore_db.collection('matches').add({
+        "date":
+            "${match.date.year}-${match.date.month.toString().padLeft(2, '0')}-${match.date.day.toString().padLeft(2, '0')}",
+        "time":
+            "${match.date.hour.toString().padLeft(2, '0')}:${match.date.minute.toString().padLeft(2, '0')}:00",
+        "duration": match.duration,
+        "ownerId": match.owner.email,
+        "clubId": club.id,
+        "public": match.isPublic
+      });
+
       logger.d(
-          "$this: Added the following ${(isPublic) ? "public" : "private"} match to the club \"${club.name}\": ${match.toString()}");
+          "$this: Added the following ${(match.isPublic) ? "public" : "private"} match to the club \"${club.name}\": ${match.toString()}");
     } catch (e) {}
   }
 }
