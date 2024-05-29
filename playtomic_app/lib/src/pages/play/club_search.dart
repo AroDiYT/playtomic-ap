@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/club.dart';
@@ -20,6 +24,9 @@ class ClubSearch extends StatefulWidget {
 }
 
 class _ClubSearchState extends State<ClubSearch> {
+  // 2 views of this page: list (false) and map (true)
+  bool view = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,11 +44,15 @@ class _ClubSearchState extends State<ClubSearch> {
         centerTitle: true,
         actions: [
           TextButton(
-              onPressed: () {},
-              child: const Text(
-                "Kaart bekijken",
-                style: TextStyle(color: Colors.blue, fontSize: 14),
-              ))
+              onPressed: () {
+                setState(() {
+                  view = !view;
+                });
+              },
+              child: Text(
+                (!view) ? "Kaart bekijken" : "Lijst bekijken",
+                style: const TextStyle(color: Colors.blue, fontSize: 14),
+              )),
         ],
       ),
       body: FutureBuilder(
@@ -51,62 +62,90 @@ class _ClubSearchState extends State<ClubSearch> {
             return const Text("Loading");
           } else {
             var clubs = snapshot.data!;
-            return CustomScrollView(slivers: [
-              SliverAppBar(
-                pinned: true,
-                automaticallyImplyLeading: false,
-                scrolledUnderElevation: 0,
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(66),
-                  child: Column(
-                    children: [
-                      searchBox(),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.tune_outlined),
-                            const SizedBox(width: 10),
-                            searchFilter([
-                              const SizedBox(width: 6),
-                              const Text(
-                                "Padel",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              const Icon(
-                                Icons.arrow_drop_down_rounded,
-                                color: Colors.white,
-                                size: 30,
-                              )
-                            ]),
-                            const SizedBox(width: 10),
-                            searchFilter([const Text("Vandaag")]),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SliverList.builder(
-                itemCount: clubs.length,
-                itemBuilder: (ctx, i) => clubs
-                    .map((club) => InkWell(
-                        onTap: () =>
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (context, _, __) => ClubPage(
-                                      club: club,
-                                      user: widget.user,
-                                      logger: widget.logger,
-                                    ))),
-                        child: clubCard(club)))
-                    .toList()[i],
-              )
-            ]);
+
+            return (!view) ? listView(clubs, context) : mapView(clubs);
           }
         },
       ),
     );
+  }
+
+  Widget mapView(List<Club> clubs) {
+    return FlutterMap(
+        mapController: MapController(),
+        options: const MapOptions(
+            initialCenter: LatLng(50.845334, 4.343755), initialZoom: 12),
+        children: [
+          TileLayer(
+            tileProvider: CancellableNetworkTileProvider(),
+            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          ),
+          MarkerLayer(
+              markers: clubs
+                  .map((e) => Marker(
+                      point: LatLng(e.geo.latitude, e.geo.longitude),
+                      alignment: Alignment.topCenter,
+                      child: const Icon(
+                        FontAwesomeIcons.locationDot,
+                        size: 40,
+                        color: Colors.black,
+                      )))
+                  .toList())
+        ]);
+  }
+
+  Widget listView(List<Club> clubs, BuildContext context) {
+    return CustomScrollView(slivers: [
+      SliverAppBar(
+        pinned: true,
+        automaticallyImplyLeading: false,
+        scrolledUnderElevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(66),
+          child: Column(
+            children: [
+              searchBox(),
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    const Icon(Icons.tune_outlined),
+                    const SizedBox(width: 10),
+                    searchFilter([
+                      const SizedBox(width: 6),
+                      const Text(
+                        "Padel",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const Icon(
+                        Icons.arrow_drop_down_rounded,
+                        color: Colors.white,
+                        size: 30,
+                      )
+                    ]),
+                    const SizedBox(width: 10),
+                    searchFilter([const Text("Vandaag")]),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      SliverList.builder(
+        itemCount: clubs.length,
+        itemBuilder: (ctx, i) => clubs
+            .map((club) => InkWell(
+                onTap: () => Navigator.of(context).push(PageRouteBuilder(
+                    pageBuilder: (context, _, __) => ClubPage(
+                          club: club,
+                          user: widget.user,
+                          logger: widget.logger,
+                        ))),
+                child: clubCard(club)))
+            .toList()[i],
+      )
+    ]);
   }
 
   SizedBox searchFilter(List<Widget> text) {
