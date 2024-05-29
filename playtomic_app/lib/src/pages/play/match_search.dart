@@ -3,6 +3,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/model/match.dart';
 import 'package:playtomic_app/src/model/user.dart';
 
 class MatchSearch extends StatefulWidget {
@@ -119,7 +120,7 @@ class _MatchSearchState extends State<MatchSearch>
                 ),
                 Expanded(
                   child: Text(
-                    "De eerste speler bepaalt of het een competitie is.",
+                    "Type wedstrijd onbekend",
                     overflow: TextOverflow.ellipsis,
                   ),
                 )
@@ -133,58 +134,132 @@ class _MatchSearchState extends State<MatchSearch>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
+                    width: 80,
                     margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: [
-                        GFAvatar(
-                          backgroundColor: Colors.red.shade300,
-                          foregroundColor: Colors.red,
-                          child: const Icon(Icons.person),
-                        ),
-                        const Text("Vrij")
-                      ],
-                    ),
+                    child: (match.team1.isEmpty)
+                        ? defaultTeamMember(1)
+                        : FutureBuilder(
+                            future: widget.db.loadUser(match.team1[0]),
+                            builder: (ctx, snap) {
+                              if (snap.hasData) {
+                                AppUser user = snap.data!;
+
+                                return Column(
+                                  children: [
+                                    GFAvatar(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 0, 20, 20),
+                                      child: Text(user.name[0]),
+                                    ),
+                                    Expanded(
+                                        child: Text(
+                                      user.name.split(' ')[0],
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
+                                  ],
+                                );
+                              } else {
+                                return defaultTeamMember(1);
+                              }
+                            },
+                          ),
                   ),
                   Container(
+                    width: 80,
                     margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: [
-                        GFAvatar(
-                          backgroundColor: Colors.red.shade300,
-                          foregroundColor: Colors.red,
-                          child: const Icon(Icons.person),
-                        ),
-                        const Text("Vrij")
-                      ],
-                    ),
+                    child: (match.team1.length <= 1)
+                        ? defaultTeamMember(1)
+                        : FutureBuilder(
+                            future: widget.db.loadUser(match.team1[1]),
+                            builder: (ctx, snap) {
+                              if (snap.hasData) {
+                                AppUser user = snap.data!;
+
+                                return Column(
+                                  children: [
+                                    GFAvatar(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 0, 20, 20),
+                                      child: Text(user.name[0]),
+                                    ),
+                                    Expanded(
+                                        child: Text(
+                                      user.name.split(' ')[0],
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
+                                  ],
+                                );
+                              } else {
+                                return defaultTeamMember(1);
+                              }
+                            },
+                          ),
                   ),
                   VerticalDivider(
                     thickness: 1,
                     color: Colors.grey.shade700,
                   ),
                   Container(
+                    width: 80,
                     margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: [
-                        GFAvatar(
-                          backgroundColor: Colors.lightBlue.shade300,
-                          child: const Icon(Icons.person),
-                        ),
-                        const Text("Vrij")
-                      ],
-                    ),
+                    child: (match.team2.isEmpty)
+                        ? defaultTeamMember(2)
+                        : FutureBuilder(
+                            future: widget.db.loadUser(match.team2[0]),
+                            builder: (ctx, snap) {
+                              if (snap.hasData) {
+                                AppUser user = snap.data!;
+
+                                return Column(
+                                  children: [
+                                    GFAvatar(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 0, 20, 20),
+                                      child: Text(user.name[0]),
+                                    ),
+                                    Expanded(
+                                        child: Text(
+                                      user.name.split(' ')[0],
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
+                                  ],
+                                );
+                              } else {
+                                return defaultTeamMember(2);
+                              }
+                            },
+                          ),
                   ),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: [
-                        GFAvatar(
-                          backgroundColor: Colors.lightBlue.shade300,
-                          child: const Icon(Icons.person),
-                        ),
-                        const Text("Vrij")
-                      ],
-                    ),
+                    width: 80,
+                    child: (match.team2.length <= 1)
+                        ? defaultTeamMember(2)
+                        : FutureBuilder(
+                            future: widget.db.loadUser(match.team2[1]),
+                            builder: (ctx, snap) {
+                              if (snap.hasData) {
+                                AppUser user = snap.data!;
+
+                                return Column(
+                                  children: [
+                                    GFAvatar(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 0, 20, 20),
+                                      child: Text(user.name[0]),
+                                    ),
+                                    Expanded(
+                                        child: Text(
+                                      user.name.split(' ')[0],
+                                      overflow: TextOverflow.ellipsis,
+                                    ))
+                                  ],
+                                );
+                              } else {
+                                return defaultTeamMember(2);
+                              }
+                            },
+                          ),
                   ),
                 ],
               ),
@@ -242,8 +317,31 @@ class _MatchSearchState extends State<MatchSearch>
     );
   }
 
-  String getMonth(int dayoftheweek) {
-    switch (dayoftheweek) {
+  Widget defaultTeamMember(int team) {
+    var children = (team == 1)
+        ? [
+            GFAvatar(
+              backgroundColor: Colors.lightBlue.shade300,
+              child: const Icon(Icons.person),
+            ),
+            const Text("Vrij")
+          ]
+        : [
+            GFAvatar(
+              backgroundColor: Colors.red.shade300,
+              foregroundColor: Colors.red,
+              child: const Icon(Icons.person),
+            ),
+            const Text("Vrij")
+          ];
+
+    return Column(
+      children: children,
+    );
+  }
+
+  String getMonth(int monthNr) {
+    switch (monthNr) {
       case 1:
         return "Jan";
       case 2:

@@ -8,6 +8,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/model/match.dart';
 import 'package:playtomic_app/src/model/user.dart';
 
 class Booking extends StatefulWidget {
@@ -51,7 +52,7 @@ class _BookingState extends State<Booking> {
         .getMatchesByDate(widget.club.id, pickedDate)
         .then((taken) {
       List<bool> slots = List.generate(32, (index) => false);
-      slots.setRange(30, 31, List.filled(2, true));
+      slots.setRange(30, 32, List.filled(2, true));
 
       if (taken.isNotEmpty) {
         widget.logger.d("$this: Checking retrieved matches");
@@ -306,7 +307,8 @@ class _BookingState extends State<Booking> {
                                                 selectedTime % 60),
                                             owner: widget.user,
                                             club: widget.club,
-                                            isPublic: true);
+                                            isPublic: true,
+                                            team1: [widget.user.email]);
 
                                         widget.db.createMatch(
                                           widget.club,
@@ -371,13 +373,11 @@ class _BookingState extends State<Booking> {
                                               (selectedTime / 60).floor(),
                                               selectedTime % 60),
                                           owner: widget.user,
-                                          club: widget.club);
-                                      widget.club.matches.add(match);
+                                          club: widget.club,
+                                          team1: [widget.user.email]);
 
                                       reserved = refreshTimeslots();
 
-                                      widget.logger
-                                          .d(widget.club.matches.toString());
                                       widget.db.createMatch(widget.club, match);
                                     });
                             },
