@@ -9,6 +9,7 @@ import 'package:playtomic_app/src/model/user.dart';
 import 'package:playtomic_app/src/pages/play/club_card.dart';
 import 'package:playtomic_app/src/pages/play/club_page.dart';
 import 'package:playtomic_app/src/pages/play/club_search.dart';
+import 'package:playtomic_app/src/pages/play/match_search.dart';
 import 'package:playtomic_app/src/pages/play/play_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -224,13 +225,22 @@ class _PlayContentState extends State<PlayContent> {
                             const SizedBox(
                               width: 10,
                             ),
-                            const Expanded(
-                              child: PlayCard(
-                                title: "Speel een wedstrijd",
-                                icon: Icons.sports_tennis_outlined,
-                                description:
-                                    "Als je op zoek bent naar spelers van jouw niveau",
-                                imagePath: "images/loginimage_9-16.jpg",
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                        pageBuilder: (ctx, _, __) =>
+                                            MatchSearch(
+                                              user: user,
+                                            ))),
+                                child: const PlayCard(
+                                  title: "Speel een wedstrijd",
+                                  icon: Icons.sports_tennis_outlined,
+                                  description:
+                                      "Als je op zoek bent naar spelers van jouw niveau",
+                                  imagePath: "images/loginimage_9-16.jpg",
+                                ),
                               ),
                             ),
                           ],

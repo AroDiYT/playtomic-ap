@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/model/match.dart';
 import 'package:playtomic_app/src/model/user.dart';
 
 class Database {
@@ -62,19 +63,39 @@ class Database {
     } catch (e) {}
   }
 
-  /// Gets a [Club] from the database
+  /// Gets all [Club]s from the database
   Future<List<Club>> getClubs() async {
     var clubsSnapshot = await firestore_db.collection("clubs").get();
     var clubs = clubsSnapshot.docs.map((clubDocument) {
       var clubData = clubDocument.data();
       return Club(
-          id: clubDocument.id,
-          name: clubData["name"],
-          image: clubData["image"],
-          location: clubData["location"]);
+        id: clubDocument.id,
+        name: clubData["name"],
+        image: clubData["image"],
+        location: clubData["location"],
+      );
     }).toList();
 
     return clubs;
+  }
+
+  /// Gets all [Club]s from the database
+  Future<Club> getClub(String clubId) async {
+    logger.d("Database: Getting club with id: $clubId");
+
+    var clubsSnapshot =
+        await firestore_db.collection("clubs").doc(clubId).get();
+
+    var club = clubsSnapshot.data()!;
+
+    logger.d("Found club with name: ${club["name"]}");
+
+    return Club(
+      id: clubId,
+      name: club["name"],
+      image: club["image"],
+      location: club["location"],
+    );
   }
 
   Future<void> createClub(Club club) async {
@@ -106,19 +127,24 @@ class Database {
     List<PadelMatch> matches = List.empty(growable: true);
     try {
       firestore_db
-          .collection("clubs")
-          .doc(clubId)
           .collection("matches")
+          .where("clubId", isEqualTo: clubId)
           .get()
           .then((QuerySnapshot<Map<String, dynamic>> snap) => {
                 snap.docs.forEach((matchDoc) async {
                   AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+                  Club club = await getClub(clubId);
+
                   matches.add(PadelMatch(
                       date: DateTime.parse(matchDoc.data()["date"] +
                           " " +
                           matchDoc.data()["time"]),
                       duration: matchDoc.data()["duration"],
-                      owner: user));
+                      owner: user,
+                      club: club,
+                      isPublic: matchDoc.data()["isPublic"],
+                      team1: matchDoc.data()["team1"],
+                      team2: matchDoc.data()["team2"]));
                 })
               });
     } catch (e) {
@@ -129,13 +155,14 @@ class Database {
 
   Future<List<PadelMatch>> getMatchesByDate(
       String clubId, DateTime date) async {
-    logger.d("$this: Getting matches from ${date.toString()}");
+    logger.d("Database: Getting matches from ${date.toString()}");
 
     try {
+      Club club = await getClub(clubId);
+
       var snap = await firestore_db
-          .collection("clubs")
-          .doc(clubId)
           .collection("matches")
+          .where("clubId", isEqualTo: clubId)
           .where("date",
               isEqualTo:
                   "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}")
@@ -143,38 +170,129 @@ class Database {
 
       var matches = await Future.wait(snap.docs.map((matchDoc) async {
         logger.d(
-            "$this: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
+            "Database: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
 
         AppUser user = await loadUser(matchDoc.data()["ownerId"]);
 
-        logger.d("$this: OwnerId: ${user.email}");
+        logger.d("Database: OwnerId: ${user.email}");
+
+        // Add the match to the list
         return PadelMatch(
             date: DateTime.parse(
                 matchDoc.data()["date"] + " " + matchDoc.data()["time"]),
             duration: matchDoc.data()["duration"],
-            owner: user);
+            owner: user,
+            club: club,
+            isPublic: matchDoc.data()["isPublic"],
+            team1: matchDoc.data()["team1"],
+            team2: matchDoc.data()["team2"]);
       }).toList());
 
-      logger.d("$this: Matches: $matches");
+      logger.d("Database: Matches: $matches");
       return matches;
     } catch (e) {
-      logger.e("$this: Error loading matches. \n${e.toString()}");
+      logger.e("Database: Error loading matches by date. \n${e.toString()}");
       return List<PadelMatch>.empty();
     }
   }
 
-  Future<void> createMatch(Club club, PadelMatch match) async {
+  /// Retrieves all the matches where [user] is the owner.
+  Future<List<PadelMatch>> getMatchesByUser(AppUser user) async {
     try {
-      firestore_db.collection('clubs').doc(club.id).collection('matches').add({
+      var snap = await firestore_db
+          .collection("matches")
+          .where("ownerId", isEqualTo: user.email)
+          .get();
+
+      var matches = await Future.wait(snap.docs.map((matchDoc) async {
+        logger.d(
+            "Database: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
+
+        AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+        Club club = await getClub(matchDoc.data()["clubId"]);
+
+        logger.d("Database: OwnerId: ${user.email}");
+
+        // Add the match to the list
+        return PadelMatch(
+            date: DateTime.parse(
+                matchDoc.data()["date"] + " " + matchDoc.data()["time"]),
+            duration: matchDoc.data()["duration"],
+            owner: user,
+            club: club,
+            isPublic: matchDoc.data()["isPublic"],
+            team1: matchDoc.data()["team1"],
+            team2: matchDoc.data()["team2"]);
+      }).toList());
+
+      logger.d("Database: Matches by user: $matches");
+      return matches;
+    } catch (e) {
+      logger.e(
+          "Database: Error loading matches where the user is owner. \n${e.toString()}");
+      return List<PadelMatch>.empty();
+    }
+  }
+
+  /// Retrieves all the matches from all the clubs that are open to join.
+  Future<List<PadelMatch>> getOpenMatches() async {
+    try {
+      var snap = await firestore_db
+          .collection("matches")
+          .where("isPublic", isEqualTo: true)
+          .get();
+
+      var matches = await Future.wait(snap.docs.map((matchDoc) async {
+        logger.d(
+            "$this: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
+
+        AppUser user = await loadUser(matchDoc.data()["ownerId"]);
+        Club club = await getClub(matchDoc.data()["clubId"]);
+
+        logger.d("$this: OwnerId: ${user.email}");
+
+        // Add the match to the list
+        return PadelMatch(
+            date: DateTime.parse(
+                matchDoc.data()["date"] + " " + matchDoc.data()["time"]),
+            duration: matchDoc.data()["duration"],
+            owner: user,
+            club: club,
+            isPublic: matchDoc.data()["isPublic"],
+            team1: matchDoc.data()["team1"],
+            team2: matchDoc.data()["team2"]);
+      }).toList());
+
+      logger.d("Database: Open matches: $matches");
+      return matches;
+    } catch (e) {
+      logger.e("Database: Error loading open matches. \n${e.toString()}");
+      return List<PadelMatch>.empty();
+    }
+  }
+
+  Future<void> createMatch(
+    Club club,
+    PadelMatch match,
+  ) async {
+    try {
+      firestore_db.collection('matches').add({
         "date":
             "${match.date.year}-${match.date.month.toString().padLeft(2, '0')}-${match.date.day.toString().padLeft(2, '0')}",
         "time":
             "${match.date.hour.toString().padLeft(2, '0')}:${match.date.minute.toString().padLeft(2, '0')}:00",
         "duration": match.duration,
         "ownerId": match.owner.email,
+        "clubId": club.id,
+        "isPublic": match.isPublic,
+        "team1": match.team1,
+        "team2": match.team2
       });
+
       logger.d(
-          "$this: Added the following match to the club \"${club.name}\": ${match.toString()}");
-    } catch (e) {}
+          "$this: Added the following ${(match.isPublic) ? "public" : "private"} match to the club \"${club.name}\": ${match.toString()}");
+    } catch (e) {
+      logger.e("Database: Could not add match to database.");
+    }
   }
 }

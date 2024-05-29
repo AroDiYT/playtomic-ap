@@ -222,20 +222,71 @@ class _ClubSearchState extends State<ClubSearch> {
           Container(
             margin: const EdgeInsets.all(20),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                     margin: const EdgeInsets.only(bottom: 10),
                     child: Text(club.location["city"])),
-                Container(
-                  width: 70,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Text("19:00")]),
-                )
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 50,
+                  height: 40,
+                  child: FutureBuilder(
+                      future:
+                          widget.db.getMatchesByDate(club.id, DateTime.now()),
+                      builder: (ctx, snap) {
+                        if (snap.hasData) {
+                          List<int> times =
+                              List.generate(30, (index) => (index * 30) + 480);
+                          List<bool> available =
+                              List.generate(30, (index) => true);
+
+                          var matches = snap.data!;
+                          for (var el in matches) {
+                            if (el.date.hour < 13) {
+                              int start =
+                                  (((el.date.hour * 60 + el.date.minute) -
+                                              480) /
+                                          30)
+                                      .floor();
+                              int end = start + ((el.duration / 30).floor());
+                              available.setRange(
+                                  start, end, List.filled(end, false));
+                            }
+                          }
+
+                          List<Widget> children = [];
+                          for (int i = 0; i < 10; i++) {
+                            if (available[i]) {
+                              children.add(Container(
+                                margin: const EdgeInsets.only(right: 6),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Text(
+                                    "${(times[i] / 60).floor().toString().padLeft(2, '0')}:${(times[i] % 60).toString().padLeft(2, '0')}"),
+                              ));
+                            }
+                          }
+
+                          return ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: children);
+                        }
+
+                        return Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: const Text(
+                            "Er is geen beschikbaarheid in dit tijdslot.",
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }),
+                ),
               ],
             ),
           ),

@@ -1,8 +1,14 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:getwidget/components/button/gf_button.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/club.dart';
+import 'package:playtomic_app/src/model/match.dart';
 import 'package:playtomic_app/src/model/user.dart';
 
 class Booking extends StatefulWidget {
@@ -25,41 +31,40 @@ class _BookingState extends State<Booking> {
   var pickedDate = DateTime.now();
   var selectedTime = 480;
   List<DateTime> dates = List.empty(growable: true);
-  late Future<List<int>> timeslots;
+  late Future<List<bool>> reserved;
 
   @override
   void initState() {
     for (int i = 0; i < 60; i++) {
       dates.add(DateTime.now().add(Duration(days: i)));
     }
-    timeslots = refreshTimeslots();
+    reserved = refreshTimeslots();
     super.initState();
   }
 
   /// Gets the matches that have been booked for the day the user selected,
   /// and makes the corresponding timeslots unavailable;
-  Future<List<int>> refreshTimeslots() async {
-    widget.logger.d("Refreshing timeslots");
+  Future<List<bool>> refreshTimeslots() async {
+    widget.logger.d("$this: Refreshing timeslots");
 
-    var slots = List<int>.empty(growable: true);
     return await widget.db
         .getMatchesByDate(widget.club.id, pickedDate)
         .then((taken) {
-      for (int i = 0; i < 30; i++) {
-        slots.add(480 + i * 30);
-      }
+      List<bool> slots = List.generate(32, (index) => false);
+      slots.setRange(30, 32, List.filled(2, true));
 
       if (taken.isNotEmpty) {
-        widget.logger.d("Checking retrieved matches");
+        widget.logger.d("$this: Checking retrieved matches");
+
         for (PadelMatch match in taken) {
           int start =
               (((match.date.hour * 60 + match.date.minute) - 480) / 30).floor();
           int end = start + ((match.duration / 30).floor());
-          slots.setRange(start, end, List.filled(end, 0));
+          slots.setRange(start, end, List.filled(end, true));
         }
       }
 
-      widget.logger.d(taken);
+      widget.logger.d("$this: $taken\n$slots");
 
       return slots;
     });
@@ -91,66 +96,336 @@ class _BookingState extends State<Booking> {
               ),
             ),
             FutureBuilder(
-                future: timeslots,
+                future: reserved,
                 builder: (ctx, snap) {
                   if (snap.hasData) {
-                    return timePicker(ctx, snap.data!);
+                    var reservedSlots = snap.data!;
+                    int selectedSlot = ((selectedTime - 480) / 30).floor();
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(child: timePicker(ctx, reservedSlots)),
+                        Container(
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reserveer je plaats in een openbare reservering",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                  "In een openbare reservering speel je mee met nieuwe, onbekende spelers van jouw niveau")
+                            ],
+                          ),
+                        ),
+                        if (!(reservedSlots[selectedSlot + 1] ||
+                            reservedSlots[selectedSlot + 2]))
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 20),
+                            padding: const EdgeInsets.all(10),
+                            height: 240,
+                            width: 328,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey)),
+                            child: Stack(
+                              children: [
+                                IntrinsicWidth(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${pickedDate.day} ${getMonth(pickedDate.month)} | ${(selectedTime / 60).floor().toString().padLeft(2, '0')}:${(selectedTime % 60).toString().padLeft(2, '0')}",
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Row(
+                                        children: [
+                                          Icon(Icons
+                                              .signal_cellular_alt_outlined),
+                                          SizedBox(
+                                            width: 6,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              "De eerste speler bepaalt of het een competitie is.",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      IntrinsicHeight(
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                children: [
+                                                  GFAvatar(
+                                                    backgroundColor:
+                                                        Colors.red.shade300,
+                                                    foregroundColor: Colors.red,
+                                                    child: const Icon(
+                                                        Icons.person),
+                                                  ),
+                                                  const Text("Vrij")
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                children: [
+                                                  GFAvatar(
+                                                    backgroundColor:
+                                                        Colors.red.shade300,
+                                                    foregroundColor: Colors.red,
+                                                    child: const Icon(
+                                                        Icons.person),
+                                                  ),
+                                                  const Text("Vrij")
+                                                ],
+                                              ),
+                                            ),
+                                            VerticalDivider(
+                                              thickness: 1,
+                                              color: Colors.grey.shade700,
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                children: [
+                                                  GFAvatar(
+                                                    backgroundColor: Colors
+                                                        .lightBlue.shade300,
+                                                    child: const Icon(
+                                                        Icons.person),
+                                                  ),
+                                                  const Text("Vrij")
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                children: [
+                                                  GFAvatar(
+                                                    backgroundColor: Colors
+                                                        .lightBlue.shade300,
+                                                    child: const Icon(
+                                                        Icons.person),
+                                                  ),
+                                                  const Text("Vrij")
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const Divider(
+                                        thickness: 1,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const ImageIcon(
+                                              AssetImage(
+                                                  "assets/images/PT_logo.png"),
+                                              size: 30),
+                                          const SizedBox(width: 10),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(widget.club.name),
+                                              Text(
+                                                widget.club.location["city"],
+                                                style: TextStyle(
+                                                    color:
+                                                        Colors.grey.shade700),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            width: 80,
+                                          ),
+                                          const Column(
+                                            children: [
+                                              Text(
+                                                "€ 8",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.blue),
+                                              ),
+                                              Text("90 min",
+                                                  style: TextStyle(
+                                                      color: Colors.blue))
+                                            ],
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(35, 80, 35, 0),
+                                  child: GFButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        var match = PadelMatch(
+                                            date: DateTime(
+                                                pickedDate.year,
+                                                pickedDate.month,
+                                                pickedDate.day,
+                                                (selectedTime / 60).floor(),
+                                                selectedTime % 60),
+                                            owner: widget.user,
+                                            club: widget.club,
+                                            isPublic: true,
+                                            team1: [widget.user.email]);
+
+                                        widget.db.createMatch(
+                                          widget.club,
+                                          match,
+                                        );
+
+                                        reserved = refreshTimeslots();
+                                      });
+                                    },
+                                    color: Colors.blue.shade700,
+                                    shape: GFButtonShape.pills,
+                                    boxShadow: BoxShadow(
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
+                                        color: Colors.grey.shade700),
+                                    child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text("Reserveer de eerste plaats")
+                                        ]),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const SizedBox(
+                          height: 50,
+                        ),
+                        Container(
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reserveer een privé baan",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                  "In een privé reservering kunnen enkel spelers meedoen die je uitnodigt")
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          child: GFButton(
+                            onPressed: () {
+                              (reservedSlots[selectedSlot + 1] ||
+                                      reservedSlots[selectedSlot + 2])
+                                  ? null
+                                  : setState(() {
+                                      var match = PadelMatch(
+                                          date: DateTime(
+                                              pickedDate.year,
+                                              pickedDate.month,
+                                              pickedDate.day,
+                                              (selectedTime / 60).floor(),
+                                              selectedTime % 60),
+                                          owner: widget.user,
+                                          club: widget.club,
+                                          team1: [widget.user.email]);
+
+                                      reserved = refreshTimeslots();
+
+                                      widget.db.createMatch(widget.club, match);
+                                    });
+                            },
+                            color: (reservedSlots[selectedSlot + 1] ||
+                                    reservedSlots[selectedSlot + 2])
+                                ? Colors.grey
+                                : const Color.fromARGB(255, 0, 20, 20),
+                            fullWidthButton: true,
+                            child: const Text(
+                              "Create match (90 min)",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
                   } else {
                     return const CircularProgressIndicator(
                       color: Color.fromARGB(255, 0, 20, 20),
                     );
                   }
                 }),
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: GFButton(
-                onPressed: () => setState(() {
-                  var match = PadelMatch(
-                      date: DateTime(
-                          pickedDate.year,
-                          pickedDate.month,
-                          pickedDate.day,
-                          (selectedTime / 60).floor(),
-                          selectedTime % 60),
-                      owner: widget.user);
-                  widget.club.matches.add(match);
-
-                  setState(() {
-                    timeslots = refreshTimeslots();
-                  });
-                  widget.logger.d(widget.club.matches.toString());
-                  widget.db.createMatch(widget.club, match);
-                }),
-                color: const Color.fromARGB(255, 0, 20, 20),
-                fullWidthButton: true,
-                child: const Text(
-                  "Create match (90 min)",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            )
           ],
         ),
       ),
     );
   }
 
-  SizedBox timePicker(BuildContext context, List<int> timeslots) {
+  SizedBox timePicker(BuildContext context, List<bool> reservedSlots) {
+    List<int> slots = [];
+    for (int i = 0; i < 30; i++) {
+      slots.add(480 + i * 30);
+    }
+
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      height: 350,
+      height: 300,
       child: GridView.count(
           crossAxisCount: 6,
           childAspectRatio: 30 / 24,
-          children: timeslots.map(
+          children: slots.map(
             (slot) {
               return GridTile(
                 child: InkWell(
                   hoverColor: Colors.transparent,
                   splashColor: Colors.transparent,
-                  onTap: (slot != 0)
+                  onTap: (!reservedSlots[((slot - 480) / 30).floor()])
                       ? () {
-                          if (slot != 0) {
+                          if (!reservedSlots[((slot - 480) / 30).floor()]) {
                             setState(() {
                               selectedTime = slot;
                               widget.logger.d(
@@ -166,7 +441,7 @@ class _BookingState extends State<Booking> {
                       border: Border.all(color: Colors.grey),
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
                       color: (selectedTime != slot)
-                          ? (slot != 0)
+                          ? (!reservedSlots[((slot - 480) / 30).floor()])
                               ? Colors.white
                               : Colors.grey
                           : const Color.fromARGB(255, 0, 20, 20),
@@ -206,7 +481,7 @@ class _BookingState extends State<Booking> {
                 selectedTime = 480;
 
                 setState(() {
-                  timeslots = refreshTimeslots();
+                  reserved = refreshTimeslots();
                 });
               }),
               child: Container(
