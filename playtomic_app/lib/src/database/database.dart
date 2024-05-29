@@ -196,15 +196,19 @@ class Database {
     }
   }
 
-  /// Retrieves all the matches where [user] is the owner.
+  /// Retrieves all the matches where [user] is either the owner, a player of team 1 or a player of team 2.
   Future<List<PadelMatch>> getMatchesByUser(AppUser user) async {
     try {
-      var snap = await firestore_db
-          .collection("matches")
-          .where("ownerId", isEqualTo: user.email)
-          .get();
+      var snapshot = await firestore_db.collection("matches").get();
 
-      var matches = await Future.wait(snap.docs.map((matchDoc) async {
+      var allMatches = snapshot.docs
+          .where((snap) =>
+              snap.data().containsValue(user.email) || // user is the owner
+              snap.data()["team1"].contains(user.email) || // user is in team 1
+              snap.data()["team2"].contains(user.email)) // user is in team 2
+          .toList();
+
+      var matches = await Future.wait(allMatches.map((matchDoc) async {
         logger.d(
             "Database: Retrieved: {Date: ${matchDoc.data()["date"]} ${matchDoc.data()["time"]}, Duration: ${matchDoc.data()["duration"]}, Owner: ${matchDoc.data()["ownerId"]}}");
 
