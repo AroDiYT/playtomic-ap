@@ -33,46 +33,26 @@ class _MatchSearchState extends State<MatchSearch>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (ctx, val) => [
-          SliverAppBar(
-            scrolledUnderElevation: 0,
-            pinned: true,
-            automaticallyImplyLeading: false,
-            leading: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_ios_new_outlined),
-            ),
-            title: const Text("Open wedstrijden",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            centerTitle: true,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  children: [
-                    const Divider(
-                      thickness: 1,
-                      color: Colors.grey,
-                    ),
-                    TabBar(
-                        controller: _tabController,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: const Color.fromARGB(255, 0, 20, 20),
-                        indicatorColor: const Color.fromARGB(255, 0, 20, 20),
-                        splashFactory: NoSplash.splashFactory,
-                        tabs: tabTitles),
-                  ],
-                ),
-              ),
-            ),
-          )
-        ],
-        body: TabBarView(
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios_new_outlined),
+        ),
+        title: const Text("Open wedstrijden",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        centerTitle: true,
+        bottom: TabBar(
             controller: _tabController,
-            children: [openMatches(), yourMatches()]),
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelColor: const Color.fromARGB(255, 0, 20, 20),
+            indicatorColor: const Color.fromARGB(255, 0, 20, 20),
+            splashFactory: NoSplash.splashFactory,
+            tabs: tabTitles),
       ),
+      body: TabBarView(
+          controller: _tabController, children: [openMatches(), yourMatches()]),
     );
   }
 
@@ -85,8 +65,9 @@ class _MatchSearchState extends State<MatchSearch>
 
             if (matches.isEmpty) return const Text("OOPS! No matches found.");
 
-            return Column(
-                children: matches.map((match) => matchCard(match)).toList());
+            return ListView.builder(
+                itemCount: matches.length,
+                itemBuilder: (ctx, i) => matchCard(matches[i]));
           } else {
             return const Center(
                 child: CircularProgressIndicator(
@@ -103,8 +84,9 @@ class _MatchSearchState extends State<MatchSearch>
           if (snap.hasData) {
             List<PadelMatch> matches = snap.data!;
 
-            return Column(
-                children: matches.map((match) => matchCard(match)).toList());
+            return ListView.builder(
+                itemCount: matches.length,
+                itemBuilder: (ctx, i) => matchCard(matches[i]));
           } else {
             return const Text("OOPS! No matches found.");
           }
@@ -113,7 +95,7 @@ class _MatchSearchState extends State<MatchSearch>
 
   Widget matchCard(PadelMatch match) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20),
+      margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       height: 240,
       decoration: BoxDecoration(
@@ -180,7 +162,7 @@ class _MatchSearchState extends State<MatchSearch>
 
                   return IntrinsicHeight(
                       child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                         players[0],
                         players[1],
@@ -278,7 +260,7 @@ class _MatchSearchState extends State<MatchSearch>
     }
 
     return Container(
-      width: 80,
+      width: 60,
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: children,

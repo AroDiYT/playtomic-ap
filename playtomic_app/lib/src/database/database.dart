@@ -91,11 +91,11 @@ class Database {
     logger.d("Database: Found club with name: ${club["name"]}");
 
     return Club(
-      id: clubId,
-      name: club["name"],
-      image: club["image"],
-      location: club["location"],
-    );
+        id: clubId,
+        name: club["name"],
+        image: club["image"],
+        location: club["location"],
+        geo: club["geo"]);
   }
 
   Future<void> createClub(Club club) async {

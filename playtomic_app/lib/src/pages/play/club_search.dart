@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
@@ -26,6 +27,10 @@ class ClubSearch extends StatefulWidget {
 class _ClubSearchState extends State<ClubSearch> {
   // 2 views of this page: list (false) and map (true)
   bool view = false;
+  Club? selectedClub;
+  final _mapOptions = const MapOptions(
+      initialZoom: 12, initialCenter: LatLng(50.845334, 4.343755));
+  final _mapController = MapController();
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +52,7 @@ class _ClubSearchState extends State<ClubSearch> {
               onPressed: () {
                 setState(() {
                   view = !view;
+                  selectedClub = null;
                 });
               },
               child: Text(
@@ -55,97 +61,166 @@ class _ClubSearchState extends State<ClubSearch> {
               )),
         ],
       ),
-      body: FutureBuilder(
-        future: widget.db.getClubs(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Text("Loading");
-          } else {
-            var clubs = snapshot.data!;
-
-            return (!view) ? listView(clubs, context) : mapView(clubs);
-          }
-        },
+      body: Column(
+        children: [
+          Container(
+            height: 120,
+            color: Colors.white,
+            child: Column(
+              children: [
+                searchBox(),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.tune_outlined),
+                      const SizedBox(width: 10),
+                      searchFilter([
+                        const SizedBox(width: 6),
+                        const Text(
+                          "Padel",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        const Icon(
+                          Icons.arrow_drop_down_rounded,
+                          color: Colors.white,
+                          size: 30,
+                        )
+                      ]),
+                      const SizedBox(width: 10),
+                      searchFilter([const Text("Vandaag")]),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          FutureBuilder(
+            future: widget.db.getClubs(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Text("Loading");
+              } else {
+                var clubs = snapshot.data!;
+                return (!view) ? listView(clubs, context) : mapView(clubs);
+              }
+            },
+          ),
+        ],
       ),
     );
   }
 
   Widget mapView(List<Club> clubs) {
-    return FlutterMap(
-        mapController: MapController(),
-        options: const MapOptions(
-            initialCenter: LatLng(50.845334, 4.343755), initialZoom: 12),
+    return SizedBox(
+      height:
+          MediaQuery.of(context).size.height - 176, // search bar is 176px tall
+      child: Stack(
+        alignment: Alignment.bottomLeft,
         children: [
-          TileLayer(
-            tileProvider: CancellableNetworkTileProvider(),
-            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          ),
-          MarkerLayer(
-              markers: clubs
-                  .map((e) => Marker(
-                      point: LatLng(e.geo.latitude, e.geo.longitude),
-                      alignment: Alignment.topCenter,
-                      child: const Icon(
-                        FontAwesomeIcons.locationDot,
-                        size: 40,
-                        color: Colors.black,
-                      )))
-                  .toList())
-        ]);
+          FlutterMap(
+              mapController: _mapController,
+              options: _mapOptions,
+              children: [
+                TileLayer(
+                  tileProvider: CancellableNetworkTileProvider(),
+                  urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                ),
+                MarkerLayer(
+                    markers: clubs
+                        .map((e) => Marker(
+                            point: LatLng(e.geo.latitude, e.geo.longitude),
+                            alignment: Alignment.topCenter,
+                            child: InkWell(
+                              onTap: () {
+                                widget.logger
+                                    .d("ClubSearch: Tapped on: ${e.name}");
+                                setState(() {
+                                  selectedClub = e;
+                                  _mapController.move(
+                                      LatLng(e.geo.latitude, e.geo.longitude),
+                                      15);
+                                });
+                              },
+                              child: const Icon(
+                                FontAwesomeIcons.locationDot,
+                                size: 40,
+                                color: Colors.black,
+                              ),
+                            )))
+                        .toList()),
+              ]),
+          mapPopup(selectedClub)
+        ],
+      ),
+    );
+  }
+
+  Widget mapPopup(Club? club) {
+    return (club != null)
+        ? Container(
+            color: Colors.white,
+            height: 100,
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () => Navigator.of(context).push(PageRouteBuilder(
+                      pageBuilder: (context, _, __) => ClubPage(
+                            club: club,
+                            user: widget.user,
+                            logger: widget.logger,
+                          ))),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        club.name,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                      Text(
+                          "${club.location["street"]} ${club.location["nr"]}, ${club.location["city"]}")
+                    ],
+                  ),
+                ),
+                IconButton(
+                    onPressed: () => setState(() {
+                          selectedClub = null;
+                          _mapController.move(_mapController.camera.center, 12);
+                        }),
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 30,
+                    ))
+              ],
+            ),
+          )
+        : const SizedBox(
+            height: 0,
+          );
   }
 
   Widget listView(List<Club> clubs, BuildContext context) {
-    return CustomScrollView(slivers: [
-      SliverAppBar(
-        pinned: true,
-        automaticallyImplyLeading: false,
-        scrolledUnderElevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(66),
-          child: Column(
-            children: [
-              searchBox(),
-              Container(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    const Icon(Icons.tune_outlined),
-                    const SizedBox(width: 10),
-                    searchFilter([
-                      const SizedBox(width: 6),
-                      const Text(
-                        "Padel",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      const Icon(
-                        Icons.arrow_drop_down_rounded,
-                        color: Colors.white,
-                        size: 30,
-                      )
-                    ]),
-                    const SizedBox(width: 10),
-                    searchFilter([const Text("Vandaag")]),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      SliverList.builder(
-        itemCount: clubs.length,
-        itemBuilder: (ctx, i) => clubs
-            .map((club) => InkWell(
-                onTap: () => Navigator.of(context).push(PageRouteBuilder(
-                    pageBuilder: (context, _, __) => ClubPage(
-                          club: club,
-                          user: widget.user,
-                          logger: widget.logger,
-                        ))),
-                child: clubCard(club)))
-            .toList()[i],
-      )
-    ]);
+    return SizedBox(
+      height:
+          MediaQuery.of(context).size.height - 176, // search bar is 176px tall
+      child: ListView.builder(
+          itemCount: clubs.length,
+          itemBuilder: (ctx, i) => clubs
+              .map((club) => InkWell(
+                  onTap: () => Navigator.of(context).push(PageRouteBuilder(
+                      pageBuilder: (context, _, __) => ClubPage(
+                            club: club,
+                            user: widget.user,
+                            logger: widget.logger,
+                          ))),
+                  child: clubCard(club)))
+              .toList()[i]),
+    );
   }
 
   SizedBox searchFilter(List<Widget> text) {
