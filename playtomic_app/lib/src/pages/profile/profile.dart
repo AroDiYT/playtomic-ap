@@ -50,14 +50,19 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     final uData = snapshot.data() as Map<String, dynamic>;
 
     return AppUser(
-        email: uData['email'], name: uData['name'], tel: uData['tel']);
+        email: uData['email'],
+        name: uData['name'],
+        tel: uData['tel'],
+        preferences: Map<String, int>.from(uData['preferences']));
   }
 
-  updateUser(AppUser user) async {
+  Future<void> updateUser(AppUser user) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user.email)
-        .set(user.toMap());
+        // Using merge will preserve fields not included in the AppUser data model.
+        // This is good in cases we dont want new fields added via backend to be overwritten.
+        .set(user.toMap(), SetOptions(merge: true));
   }
 
   @override

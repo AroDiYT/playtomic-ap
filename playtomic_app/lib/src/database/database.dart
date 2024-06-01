@@ -22,7 +22,10 @@ class Database {
     final uData = snapshot.data() as Map<String, dynamic>;
 
     return AppUser(
-        email: uData['email'], name: uData['name'], tel: uData['tel']);
+        email: uData['email'],
+        name: uData['name'],
+        tel: uData['tel'],
+        preferences: Map<String, int>.from(uData['preferences']));
   }
 
   /// Creates a given [AppUser] in the database.

@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:playtomic_app/src/model/user.dart';
+
+import '../../database/database.dart';
 
 class EditPreferences extends StatefulWidget {
   final AppUser user;
@@ -130,6 +133,27 @@ class _EditPreferencesState extends State<EditPreferences>
             height: 10,
           ),
           toggleButtons(selectedTime, timeTypes),
+          const SizedBox(
+            height: 20,
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              var prefs = Map<String, int>.from({
+                "hand": selectedHand.indexOf(true),
+                "position": selectedPosition.indexOf(true),
+                "type": selectedMatchType.indexOf(true),
+                "favTime": selectedTime.indexOf(true)
+              });
+
+              widget.user.preferences = prefs;
+              Database(widget.logger).updateUser(
+                  Map<String, Map<String, int>>.from({"preferences": prefs}),
+                  widget.user.email);
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.save_as),
+            label: const Text("Save"),
+          ),
         ],
       ),
     );
@@ -201,8 +225,11 @@ class _EditPreferencesState extends State<EditPreferences>
 
             widget.logger.d("Updated user preferences");
             widget.logger.d(widget.user.preferences);
-
+            Database(widget.logger).updateUser(
+                Map<String, Map<String, int>>.from({"preferences": prefs}),
+                widget.user.email);
             Navigator.pop(context);
+
             widget.logger.d("Go back");
           },
           icon: const Icon(Icons.arrow_back)),
