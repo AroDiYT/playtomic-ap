@@ -4,6 +4,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:logger/logger.dart';
+import 'package:playtomic_app/src/database/database.dart';
 import 'package:playtomic_app/src/model/user.dart';
 import 'package:playtomic_app/src/pages/profile/edit_preferences.dart';
 import 'package:playtomic_app/src/pages/profile/hamburger_pages/edit_interests.dart';
@@ -166,6 +167,7 @@ class _EditProfileState extends State<EditProfile> {
       children: [
         TextFormField(
           initialValue: widget.user.name,
+          onChanged: (name) => widget.user.name = name,
           decoration: const InputDecoration(
               border: InputBorder.none,
               label: Text(
@@ -195,7 +197,9 @@ class _EditProfileState extends State<EditProfile> {
                 "Telefoon",
                 style: TextStyle(fontSize: 14),
               )),
-          onInputChanged: (number) {},
+          onInputChanged: (number) {
+            widget.user.tel = number.toString();
+          },
           selectorConfig:
               const SelectorConfig(selectorType: PhoneInputSelectorType.DIALOG),
           initialValue: PhoneNumber(isoCode: "BE"),
@@ -219,7 +223,13 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               );
             }).toList(),
-            onChanged: (item) {}),
+            onChanged: (item) {
+              widget.user.gender = (item == "Mannelijk"
+                  ? 0
+                  : item == "Vrouwelijk"
+                      ? 1
+                      : 2);
+            }),
         const SizedBox(
           height: 16,
         ),
@@ -382,8 +392,10 @@ class _EditProfileState extends State<EditProfile> {
       ),
       actions: [
         TextButton(
-            onPressed: () {
+            onPressed: () async {
               logger.d("Pressed \"Save\"");
+              await Database(logger)
+                  .updateUser(widget.user.toMap(), widget.user.email);
             },
             child: const Text(
               "Opslaan",
